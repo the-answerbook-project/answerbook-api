@@ -64,12 +64,4 @@ jobs:
           python-version-file: 'pyproject.toml'
           cache: 'poetry'
       - name: Run tests with coverage
-        run: poetry run pytest --junitxml=report.xml --cov=app/ --cov-report=xml --cov-report=term-missing tests/
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./coverage.xml
-          fail_ci_if_error: true
-          flags: unittests
-          name: codecov-umbrella
-          verbose: true
+        run: poetry run pytest --junitxml=report.xml --cov=api/ --cov-report=xml --cov-report=term-missing tests/
