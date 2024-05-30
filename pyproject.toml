@@ -32,3 +32,4 @@ build-backend = "poetry.core.masonry.api"
 [tool.mypy]
 exclude = "venv"
 disable_error_code = "var-annotated"
+ignore_missing_imports = true
