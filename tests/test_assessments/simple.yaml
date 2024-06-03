@@ -1,0 +1,33 @@
+course code: 11111
+course name: The course name
+alternative codes:
+  - 22222
+  - 33333
+begins: 2019-01-01T08:00:00Z
+duration: 120
+upload time: 30
+extensions:
+  username1: 20 minutes
+  username2: 13 minutes
+  username3: 25 minutes
+labelled subparts: true
+rubric:
+  instructions: |
+    * Refer to the pdf question paper for instructions and full questions.
+    * For each question, either type your answers in the relevant text boxes, or upload them here using the dropzone at the end of the question.
+    * You can make changes to your answers as many times as you like before the deadline;\ only your final submission will be marked.
+  questions to answer: 3
+
+1:
+  title: Title of the question
+  instructions: Some instructions for this question.
+  show part weights: false
+  a:
+    show subpart weights: false
+    instructions: Some instructions for this part.
+    i:
+      instructions: Some instructions for this section.
+      maximum mark: 10
+      tasks:
+        - task: Some instructions for this task.
+          type: essay with 5 lines

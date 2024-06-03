@@ -1,13 +1,18 @@
 from fastapi import FastAPI
 
 from api.router import api_router
+from api.router.exam import exam_router
 from api.settings import Settings
 
 tags_metadata = [
     {
         "name": "status",
         "description": "API heartbeat",
-    }
+    },
+    {
+        "name": "exam",
+        "description": "Exam questions",
+    },
 ]
 
 
@@ -25,5 +30,6 @@ def create_application() -> FastAPI:
         docs_url="/",
     )
     rest_api.include_router(api_router)
+    rest_api.include_router(exam_router)
 
     return rest_api

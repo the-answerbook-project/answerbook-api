@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 import pytest
 from fastapi import FastAPI
@@ -8,7 +9,8 @@ from sqlalchemy_utils import create_database, database_exists, drop_database
 from sqlmodel import Session, SQLModel, create_engine
 
 from api import create_application, factories
-from api.dependencies.main import (
+from api.dependencies import (
+    get_assessment_config_file,
     get_session,
     get_settings,
 )
@@ -58,7 +60,9 @@ def app_fixture(session: Session):
         return session
 
     def get_settings_override():
-        return Settings(testing=1)
+        return Settings(
+            testing=1, assessments_dir=Path(__file__).parent / "test_assessments"
+        )
 
     app.dependency_overrides[get_session] = get_session_override
     app.dependency_overrides[get_settings] = get_settings_override
@@ -68,5 +72,9 @@ def app_fixture(session: Session):
 
 
 @pytest.fixture(name="client")
-def client_fixture(app) -> TestClient:
-    return TestClient(app)
+def client_fixture(app):
+    def client_for_assessment(assessment_config):
+        app.dependency_overrides[get_assessment_config_file] = lambda: assessment_config
+        return TestClient(app)
+
+    return client_for_assessment
