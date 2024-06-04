@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from starlette.middleware.cors import CORSMiddleware
 
 from api.router import api_router
 from api.router.exam import exam_router
@@ -29,6 +30,15 @@ def create_application() -> FastAPI:
         openapi_tags=tags_metadata,
         docs_url="/",
     )
+
+    rest_api.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
     rest_api.include_router(api_router)
     rest_api.include_router(exam_router)
 
