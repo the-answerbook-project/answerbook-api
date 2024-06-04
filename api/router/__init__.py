@@ -30,7 +30,7 @@ def get_status(
     """
 
     return {
-        "status": "Module Subscriptions alive",
+        "status": request.app.title,
         "version": request.app.version,
         "environment": settings.environment,
         "testing": settings.testing,
