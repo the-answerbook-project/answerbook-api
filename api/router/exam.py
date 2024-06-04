@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from starlette.status import HTTP_404_NOT_FOUND
 
 from api.dependencies import get_assessment
-from api.schemas.question import Assessment, Question
+from api.schemas.question import Assessment, AssessmentSummary, Question
 
 exam_router = APIRouter()
 
@@ -24,3 +24,18 @@ def get_question(
     if question_number not in assessment.questions:
         raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="Question not found")
     return assessment.questions[question_number]
+
+
+@exam_router.get(
+    "/summary",
+    tags=["exam"],
+    response_model=AssessmentSummary,
+    summary="Retrieve exam summary information",
+    description="""
+Retrieve the exam summary with user-specific start-time and end-time.
+""",
+)
+def get_summary(
+    assessment: Assessment = Depends(get_assessment),
+):
+    return AssessmentSummary(**assessment.dict())

@@ -12,10 +12,7 @@ extensions:
   username3: 25 minutes
 labelled subparts: true
 rubric:
-  instructions: |
-    * Refer to the pdf question paper for instructions and full questions.
-    * For each question, either type your answers in the relevant text boxes, or upload them here using the dropzone at the end of the question.
-    * You can make changes to your answers as many times as you like before the deadline;\ only your final submission will be marked.
+  instructions: Some general instructions for this exam.
   questions to answer: 3
 
 1:

@@ -65,6 +65,7 @@ class Assessment(SQLModel):
     duration: int
     extensions: dict[str, str]
     labelled_subparts: bool
+    rubric: Rubric
     questions: dict[int, Question]
 
     @field_validator("course_code", mode="before")
@@ -81,3 +82,11 @@ class Assessment(SQLModel):
             int(k): Question(**q) for k, q in values.items() if k.isnumeric()
         }
         return values
+
+
+class AssessmentSummary(SQLModel):
+    course_code: str
+    course_name: str
+    begins: datetime
+    duration: int
+    rubric: Rubric
