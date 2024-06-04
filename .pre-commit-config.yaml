@@ -10,12 +10,14 @@ repos:
     rev: v0.4.6
     hooks:
       - id: ruff
+        name: Lint code and order imports
         args: [ --select, I, --fix ]
       - id: ruff-format
+        name: Format code
   - repo: local
     hooks:
       - id: mypy
-        name: Type checks
+        name: Check types
         entry: poetry run mypy
         language: system
         types: [python]
