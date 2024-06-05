@@ -84,6 +84,9 @@ rubric:
       - instructions: |
           Some instructions for this task.
         type: integer
+      - instructions: |
+          Some instructions for this task.
+        type: flag
 2:
   title: Title of the question
   show part weights: false
