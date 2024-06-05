@@ -11,6 +11,7 @@ exam_router = APIRouter()
     "/questions/{question_number}",
     tags=["exam"],
     response_model=Question,
+    response_model_exclude_unset=True,
     summary="Retrieve exam questions' specification and metadata",
     description="""
 Retrieve the specification for the given exam question, including instructions for the question itself, its parts, their sections and tasks.
