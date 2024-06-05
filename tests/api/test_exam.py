@@ -1,3 +1,6 @@
+from api.schemas.question import TaskType
+
+
 def test_can_get_question_for_exam(client):
     res = client("simple.yaml").get("/questions/1")
     assert res.status_code == 200
@@ -13,10 +16,10 @@ def test_can_get_question_for_exam(client):
     tasks = sections["1"]["tasks"]
     assert len(tasks) == 2
     [task1, task2] = tasks
-    assert task1["type"] == "essay"
+    assert task1["type"] == TaskType.ESSAY
     assert task1["lines"] == 5
     assert task2["instructions"] == "Some instructions for this task."
-    assert task2["type"] == "multiple choice select one"
+    assert task2["type"] == TaskType.MULTIPLE_CHOICE_SELECT_ONE
     assert task2["choices"] == [
         {"value": "a", "label": "Red pill"},
         {"value": "b", "label": "Blue pill"},

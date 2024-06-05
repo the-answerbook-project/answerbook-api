@@ -15,7 +15,7 @@ from api.utils import (
 class TaskType(StrEnum):
     @staticmethod
     def _generate_next_value_(name, start, count, last_values):
-        return name.lower().replace("_", " ")
+        return name
 
     ESSAY = auto()
     INTEGER = auto()
@@ -35,6 +35,13 @@ class Task(SQLModel):
     instructions: str | None = None
     lines: int | None = None
     choices: list[MCQOption] | None = None
+
+    @field_validator("type", mode="before")
+    def translate_type(cls, v):
+        v = v.upper().replace(" ", "_")
+        if v in TaskType:
+            return TaskType[v]
+        raise ValueError(f"Invalid task type: {v}")
 
     @model_validator(mode="before")
     def parse_choices(cls, value):
