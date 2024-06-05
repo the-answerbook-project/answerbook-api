@@ -37,7 +37,8 @@ rubric:
         type: code
       - instructions: |
           Some instructions for this task.
-        type: essay with 4 lines
+        type: essay
+        lines: 4
     ii:
       instructions: |
         Some instructions for this section.
@@ -45,7 +46,8 @@ rubric:
       tasks:
       - instructions: |
           Some instructions for this task.
-        type: code with 4 lines
+        type: code
+        lines: 4
       - instructions: |
           Some instructions for this task.
         type: multiple choice select one
@@ -81,7 +83,7 @@ rubric:
           c: -1
       - instructions: |
           Some instructions for this task.
-        type: integer from 1 to 50
+        type: integer
 2:
   title: Title of the question
   show part weights: false
@@ -98,4 +100,5 @@ rubric:
       tasks:
       - instructions: |
           Some instructions for this task.
-        type: essay with 4 lines
+        type: essay
+        lines: 4
