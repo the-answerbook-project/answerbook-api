@@ -11,9 +11,16 @@ def test_can_get_question_for_exam(client):
     assert sections["1"]["instructions"] == "Some instructions for this section."
     assert sections["1"]["maximum_mark"] == 10
     tasks = sections["1"]["tasks"]
-    assert len(tasks) == 1
-    assert tasks[0]["task"] == "Some instructions for this task."
-    assert tasks[0]["type"] == "essay with 5 lines"
+    assert len(tasks) == 2
+    [task1, task2] = tasks
+    assert task1["type"] == "essay"
+    assert task1["lines"] == 5
+    assert task2["instructions"] == "Some instructions for this task."
+    assert task2["type"] == "multiple choice select one"
+    assert task2["choices"] == [
+        {"value": "a", "label": "Red pill"},
+        {"value": "b", "label": "Blue pill"},
+    ]
 
 
 def test_404_in_case_of_missing_question(client):

@@ -32,10 +32,10 @@ rubric:
         Some instructions for this section.
       maximum mark: 10
       tasks:
-      - task: |
+      - instructions: |
           Some instructions for this task.
-        type: image
-      - task: |
+        type: code
+      - instructions: |
           Some instructions for this task.
         type: essay with 4 lines
     ii:
@@ -43,21 +43,21 @@ rubric:
         Some instructions for this section.
       maximum mark: 10
       tasks:
-      - task: |
+      - instructions: |
           Some instructions for this task.
         type: code with 4 lines
-      - task: |
+      - instructions: |
           Some instructions for this task.
         type: multiple choice select one
         choices:
-          - 'Option 1': "Text for option 1"
-          - 'Option 2': "Text for option 2"
-          - 'Option 3': "Text for option 3"
-          - 'Option 4': "Text for option 4"
+          - a: "Text for option 1"
+          - b: "Text for option 2"
+          - c: "Text for option 3"
+          - d: "Text for option 4"
         answer:
-          "Option 1": 2
-          "Option 3": 1.5
-          "Option 4": -1
+          a: 2
+          c: 1.5
+          d: -1
   b:
     show subpart weights: true
     instructions: |
@@ -67,19 +67,19 @@ rubric:
         Some instructions for this section.
       maximum mark: 10
       tasks:
-      - task: |
+      - instructions: |
           Some instructions for this task.
         type: multiple choice select several
         choices:
-          - 'Option 1': "Text for option 1"
-          - 'Option 2': "Text for option 2"
-          - 'Option 3': "Text for option 3"
-          - 'Option 4': "Text for option 4"
+          - a: "Text for option 1"
+          - b: "Text for option 2"
+          - c: "Text for option 3"
+          - d: "Text for option 4"
         answer:
-          "Option 1": 2
-          "Option 3": 1.5
-          "Option 4": -1
-      - task: |
+          a: 2
+          b: 1.5
+          c: -1
+      - instructions: |
           Some instructions for this task.
         type: integer from 1 to 50
 2:
@@ -96,9 +96,6 @@ rubric:
         Some instructions for this section.
       maximum mark: 10
       tasks:
-      - task: |
-          Some instructions for this task.
-        type: image
-      - task: |
+      - instructions: |
           Some instructions for this task.
         type: essay with 4 lines

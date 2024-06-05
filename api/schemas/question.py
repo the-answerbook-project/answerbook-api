@@ -1,4 +1,5 @@
 from datetime import datetime
+from enum import StrEnum, auto
 
 from pydantic import field_validator, model_validator
 from sqlmodel import SQLModel
@@ -11,19 +12,47 @@ from api.utils import (
 )
 
 
+class TaskType(StrEnum):
+    @staticmethod
+    def _generate_next_value_(name, start, count, last_values):
+        return name.lower().replace("_", " ")
+
+    ESSAY = auto()
+    INTEGER = auto()
+    FLAG = auto()
+    CODE = auto()
+    MULTIPLE_CHOICE_SELECT_ONE = auto()
+    MULTIPLE_CHOICE_SELECT_SEVERAL = auto()
+
+
+class MCQOption(SQLModel):
+    value: str
+    label: str
+
+
 class Task(SQLModel):
-    task: str | None
-    type: str
+    type: TaskType
+    instructions: str | None = None
+    lines: int | None = None
+    choices: list[MCQOption] | None = None
+
+    @model_validator(mode="before")
+    def parse_choices(cls, value):
+        if "choices" in value:
+            value["choices"] = [
+                {"value": v, "label": l} for c in value["choices"] for v, l in c.items()
+            ]
+        return value
 
 
 class Section(SQLModel):
-    instructions: str | None
+    instructions: str | None = None
     maximum_mark: int
     tasks: list[Task]
 
 
 class Part(SQLModel):
-    instructions: str | None
+    instructions: str | None = None
     sections: dict[int, Section]
 
     @model_validator(mode="before")
@@ -38,8 +67,8 @@ class Part(SQLModel):
 
 class Question(SQLModel):
     title: str
-    show_part_weights: bool | None
-    instructions: str | None
+    show_part_weights: bool = True
+    instructions: str | None = None
     parts: dict[int, Part]
 
     @model_validator(mode="before")
@@ -53,7 +82,7 @@ class Question(SQLModel):
 
 
 class Rubric(SQLModel):
-    instructions: str | None
+    instructions: str | None = None
     questions_to_answer: int
 
 

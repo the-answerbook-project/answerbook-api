@@ -26,5 +26,10 @@ rubric:
       instructions: Some instructions for this section.
       maximum mark: 10
       tasks:
-        - task: Some instructions for this task.
-          type: essay with 5 lines
+        - type: essay
+          lines: 5
+        - instructions: Some instructions for this task.
+          type: multiple choice select one
+          choices:
+            - a: "Red pill"
+            - b: "Blue pill"
