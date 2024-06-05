@@ -1,4 +1,4 @@
-from api.schemas.question import TaskType
+from api.schemas.exam import TaskType
 
 
 def test_can_get_question_for_exam(client):

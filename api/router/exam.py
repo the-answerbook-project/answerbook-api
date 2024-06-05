@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from starlette.status import HTTP_404_NOT_FOUND
 
 from api.dependencies import get_assessment
-from api.schemas.question import Assessment, AssessmentSummary, Question
+from api.schemas.exam import Assessment, AssessmentSummary, Question
 
 exam_router = APIRouter()
 

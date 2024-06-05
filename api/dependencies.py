@@ -6,7 +6,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlmodel import Session
 
 from api.database.connection import engine
-from api.schemas.question import Assessment
+from api.schemas.exam import Assessment
 from api.settings import Settings
 from api.yaml_parser import parse_yaml
 
