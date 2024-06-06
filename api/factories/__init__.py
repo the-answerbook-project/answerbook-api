@@ -2,4 +2,6 @@ from typing import Sequence, Type
 
 from factory.alchemy import SQLAlchemyModelFactory
 
-all_factories: Sequence[Type[SQLAlchemyModelFactory]] = []
+from api.factories.exam import AnswerFactory
+
+all_factories: Sequence[Type[SQLAlchemyModelFactory]] = [AnswerFactory]
