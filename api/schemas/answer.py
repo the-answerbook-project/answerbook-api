@@ -19,3 +19,12 @@ class Answer(SQLModel,table=True):
     )
 
     ip: str = Field(nullable=True)  # TODO:: inet
+
+
+class AnswerRead(SQLModel):
+    username: str
+    question: int
+    part: int
+    section: int
+    task: int
+    answer: str
