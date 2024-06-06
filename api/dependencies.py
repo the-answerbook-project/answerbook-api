@@ -8,7 +8,7 @@ from sqlmodel import Session
 from api.database.connection import engine
 from api.schemas.exam import Assessment
 from api.settings import Settings
-from api.yaml_parser import parse_yaml
+from api.yaml_parser import encode_images_in_instructions, parse_yaml
 
 
 def get_session() -> Generator[Session, None, None]:
@@ -34,5 +34,8 @@ def get_assessment(
     settings=Depends(get_settings), assessment_id=Depends(get_assessment_id)
 ) -> Assessment:
     assessment_dir = settings.assessments_dir / assessment_id
+    images_dir = assessment_dir / "images"
     data = parse_yaml(assessment_dir / "assessment.yaml")
+    if images_dir.exists():
+        data = encode_images_in_instructions(data, images_dir)
     return Assessment(**data)

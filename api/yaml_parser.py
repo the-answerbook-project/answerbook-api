@@ -1,6 +1,38 @@
+import base64
+import re
 from pathlib import Path
 
 import yaml
+
+
+def convert_images_to_base64(markdown_text: str, base_path: Path):
+    def repl(match):
+        img_path = match.group(1)
+        full_path = base_path / img_path
+        if full_path.is_file():
+            with open(full_path, "rb") as img_file:
+                ext = full_path.suffix[1:]  # remove leading dot
+                base64_str = base64.b64encode(img_file.read()).decode("utf-8")
+                return f"data:image/{ext};base64,{base64_str}"
+        return match.group(0)
+
+    pattern = re.compile(r"!\[.*?]\((.*?)\)")
+    return re.sub(pattern, repl, markdown_text)
+
+
+def encode_images_in_instructions(data, base_path: Path):
+    if isinstance(data, dict):
+        new_data = {}
+        for key, value in data.items():
+            if key == "instructions" and isinstance(value, str):
+                new_data[key] = convert_images_to_base64(value, base_path)
+            else:
+                new_data[key] = encode_images_in_instructions(value, base_path)
+        return new_data
+    elif isinstance(data, list):
+        return [encode_images_in_instructions(item, base_path) for item in data]
+    else:
+        return data
 
 
 def construct_mapping(loader, node):
