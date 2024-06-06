@@ -7,16 +7,21 @@ import yaml
 
 def convert_images_to_base64(markdown_text: str, base_path: Path):
     def repl(match):
-        img_path = match.group(1)
+        alt_text = match.group(1)
+        img_path = match.group(2)
+        attributes = match.group(3) or ""
         full_path = base_path / img_path
         if full_path.is_file():
             with open(full_path, "rb") as img_file:
                 ext = full_path.suffix[1:]  # remove leading dot
                 base64_str = base64.b64encode(img_file.read()).decode("utf-8")
-                return f"data:image/{ext};base64,{base64_str}"
+                return (
+                    f"![{alt_text}](data:image/{ext};base64,{base64_str}){attributes}"
+                )
         return match.group(0)
 
-    pattern = re.compile(r"!\[.*?]\((.*?)\)")
+    # Improved regex pattern to capture alt text, image path, and optional attributes
+    pattern = re.compile(r"!\[(.*?)]\((.*?)\)(\{.*?})?")
     return re.sub(pattern, repl, markdown_text)
 
 

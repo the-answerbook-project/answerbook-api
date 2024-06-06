@@ -1,0 +1,30 @@
+course code: 123
+course name: Answerbook Mock Exam
+begins: 2019-08-07T11:00:00.000Z
+ends: 2019-08-25T16:00:00.000Z
+rubric:
+  instructions: |
+    * Refer to the printed sheet for instructions and full questions.
+    * You can make changes to your answers as many times as you like before the deadline; only your final submission will be marked.
+    * Always provide justifications and show any intermediate work for your answers.
+  questions to answer: 3
+1:
+  title: Lightsabers
+  instructions: This question is about lightsabers.
+  a:
+    instructions: |
+        In the Star Wars universe, there exist many different lightsabers, mainly due to the different *kyber* crystals used during their crafting.
+
+        ![A Lightsaber](starwars.jpg){: height='auto' width='100%'}
+    i:
+      maximum mark: 8
+      tasks:
+        - task: "What is your favourite lightsaber?"
+          type: multiple choice select one
+          choices:
+            - "Red": "Red"
+            - "Green": "Green"
+            - "Blue": "Blue"
+            - "Purple": "Purple"
+            - "Yellow": "Yellow"
+      instructions: Choosing a lightsaber is not an easy task, and the right choice should take into account a variety of factors. By all means, it should not boil down to *just* the colour. But let's pretend that's not the case.

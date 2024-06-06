@@ -16,6 +16,8 @@ from api.dependencies import (
 )
 from api.settings import Settings
 
+ASSESSMENTS_DIR = Path(__file__).parent / "test_assessments"
+
 TEST_DB_SERVER_URL: str = os.environ.get("TEST_DB_SERVER_URL", "postgresql://")
 
 model_factories = [f for f in factories.all_factories]
@@ -60,9 +62,7 @@ def app_fixture(session: Session):
         return session
 
     def get_settings_override():
-        return Settings(
-            testing=1, assessments_dir=Path(__file__).parent / "test_assessments"
-        )
+        return Settings(testing=1, assessments_dir=ASSESSMENTS_DIR)
 
     app.dependency_overrides[get_session] = get_session_override
     app.dependency_overrides[get_settings] = get_settings_override
