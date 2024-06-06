@@ -10,7 +10,7 @@ from sqlmodel import Session, SQLModel, create_engine
 
 from api import create_application, factories
 from api.dependencies import (
-    get_assessment_config_file,
+    get_assessment_id,
     get_session,
     get_settings,
 )
@@ -74,7 +74,7 @@ def app_fixture(session: Session):
 @pytest.fixture(name="client")
 def client_fixture(app):
     def client_for_assessment(assessment_config):
-        app.dependency_overrides[get_assessment_config_file] = lambda: assessment_config
+        app.dependency_overrides[get_assessment_id] = lambda: assessment_config
         return TestClient(app)
 
     return client_for_assessment

@@ -26,11 +26,13 @@ def get_settings() -> Settings:
     return Settings()
 
 
-def get_assessment_config_file() -> str:
-    return "y2023_12345_exam.yaml"
+def get_assessment_id() -> str:
+    return "y2023_12345_exam"
 
 
 def get_assessment(
-    settings=Depends(get_settings), config_file=Depends(get_assessment_config_file)
+    settings=Depends(get_settings), assessment_id=Depends(get_assessment_id)
 ) -> Assessment:
-    return Assessment(**parse_yaml(settings.assessments_dir / config_file))
+    assessment_dir = settings.assessments_dir / assessment_id
+    data = parse_yaml(assessment_dir / "assessment.yaml")
+    return Assessment(**data)
