@@ -22,7 +22,9 @@ rubric:
   title: Title of the question
   show part weights: true
   instructions: |
-    Some instructions for this question.
+    In the Star Wars universe, there exist many different lightsabers, mainly due to the different *kyber* crystals used during their crafting.
+
+    ![A Lightsaber](starwars.jpg)
   a:
     show subpart weights: false
     instructions: |

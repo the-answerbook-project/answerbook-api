@@ -15,7 +15,7 @@ rubric:
     instructions: |
         In the Star Wars universe, there exist many different lightsabers, mainly due to the different *kyber* crystals used during their crafting.
 
-        ![A Lightsaber](starwars.jpg){: height='auto' width='100%'}
+        ![A Lightsaber](starwars.jpg)
     i:
       maximum mark: 8
       tasks:
