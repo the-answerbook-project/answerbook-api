@@ -26,13 +26,10 @@ def test_can_get_question_for_exam(client):
     ]
 
 
-
 def test_can_get_answer_for_question_by_user(web_client):
     res = web_client.get("/questions/1/answer")
     assert res.status_code == 200
     assert res.json() == "answer"
-
-
 
 
 def test_404_in_case_of_missing_question(client):
@@ -49,7 +46,7 @@ def test_can_get_summary_for_exam(client):
     assert summary["course_name"] == "The course name"
     assert summary["duration"] == 120
     assert (
-        summary["rubric"]["instructions"] == "Some general instructions for this exam."
+            summary["rubric"]["instructions"] == "Some general instructions for this exam."
     )
     assert summary["rubric"]["questions_to_answer"] == 3
     assert summary["begins"] == "2019-01-01T08:00:00Z"
