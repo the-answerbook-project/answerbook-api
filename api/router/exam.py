@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
+from sqlmodel import Session, select
 from starlette.status import HTTP_404_NOT_FOUND
 
-from api.dependencies import get_assessment
+from api.dependencies import get_assessment, get_session
+from api.schemas.answer import Answer
 from api.schemas.exam import Assessment, AssessmentSummary, Question
 
 exam_router = APIRouter()
@@ -40,9 +42,13 @@ Retrieve the given latest answer by a user including part, section, task.
 )
 def get_answer(
     question_number: int,
-    # assessment: Assessment = Depends(get_assessment),
+session: Session = Depends(get_session),
+
 ):
-    return "answer"
+    query = select(Answer)
+    answers = session.exec(query).all()
+
+    return answers
 
 
 @exam_router.get(

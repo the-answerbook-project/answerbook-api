@@ -1,3 +1,4 @@
+from api.factories.exam import AnswerFactory
 from api.schemas.exam import TaskType
 
 
@@ -26,10 +27,14 @@ def test_can_get_question_for_exam(client):
     ]
 
 
-def test_can_get_answer_for_question_by_user(web_client):
+def test_can_get_answer_for_question_by_user(web_client, answer_factory):
+    answer = answer_factory(question=1)
+
+    # TODO user is hardcoded into query
+
     res = web_client.get("/questions/1/answer")
     assert res.status_code == 200
-    assert res.json() == "answer"
+    assert len(res.json()) == 1
 
 
 def test_404_in_case_of_missing_question(client):
