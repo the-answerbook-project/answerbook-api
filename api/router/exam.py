@@ -26,6 +26,24 @@ def get_question(
         raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="Question not found")
     return assessment.questions[question_number]
 
+# ------------------------------------------ Answers
+
+
+
+@exam_router.get(
+    "/questions/{question_number}/answer",
+    tags=["exam"],
+    summary="Retrieve answer for question by user",
+    description="""
+Retrieve the given latest answer by a user including part, section, task.
+""",
+)
+def get_answer(
+    question_number: int,
+    # assessment: Assessment = Depends(get_assessment),
+):
+    return "answer"
+
 
 @exam_router.get(
     "/summary",
