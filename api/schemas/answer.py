@@ -1,12 +1,15 @@
 from datetime import datetime
 
 import sqlmodel
+from pydantic import AnyHttpUrl
+from sqlalchemy import Column
+from sqlalchemy.dialects.postgresql import INET
 from sqlmodel import Field, SQLModel
 
 
 class Answer(SQLModel, table=True):
     id: int | None = Field(primary_key=True, default=None)
-    exam_id: int = Field(default=None)  # TODO:: FK?
+    exam_id: str = Field(default=None)
     username: str = Field(nullable=False)
     question: int = Field(default=None)
     part: int = Field(default=None)
@@ -15,15 +18,14 @@ class Answer(SQLModel, table=True):
     answer: str = Field(nullable=True)
     timestamp: datetime = Field(
         sa_column=sqlmodel.Column(
-            sqlmodel.DateTime(timezone=False),  # TODO:: True or false?
+            sqlmodel.DateTime(timezone=False),
         )
     )
 
-    ip: str = Field(nullable=True)  # TODO:: inet
+    ip: AnyHttpUrl = Field(sa_column=Column(INET))
 
 
 class AnswerRead(SQLModel):
-    username: str
     question: int
     part: int
     section: int

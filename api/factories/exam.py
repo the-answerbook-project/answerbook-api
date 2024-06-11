@@ -14,7 +14,7 @@ class AnswerFactory(SQLAlchemyModelFactory):
         sqlalchemy_session = get_session()
         sqlalchemy_session_persistence = "commit"
 
-    exam_id: int = Faker("pyint")
+    exam_id: int = Faker("pystr_format", string_format="y####_#####_exam")
     username: str = Faker(
         "pystr_format", string_format="????##", letters=string.ascii_lowercase
     )
@@ -24,7 +24,4 @@ class AnswerFactory(SQLAlchemyModelFactory):
     task: int = Faker("pyint")
     answer: str = Faker("text", max_nb_chars=277)
     timestamp: datetime = Faker("date_this_year", before_today=True, after_today=False)
-
-    ip: str = Faker(
-        "pystr_format", string_format="######", letters=string.ascii_lowercase
-    )
+    ip: str = Faker("ipv4")
