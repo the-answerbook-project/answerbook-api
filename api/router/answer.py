@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from sqlmodel import Session, asc, select
+from sqlmodel import Session, select
 
 from api.dependencies import get_assessment_id, get_session
 from api.schemas.answer import Answer, AnswerRead
@@ -28,6 +28,6 @@ def get_answer(
             Answer.exam_id == assessment_id,
             Answer.username == "hpotter",
         )
-        .order_by(asc(Answer.part), asc(Answer.section), asc(Answer.task))
+        .order_by(Answer.part, Answer.section, Answer.task)  # type: ignore
     )
     return session.exec(query).all()
