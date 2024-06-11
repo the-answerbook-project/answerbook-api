@@ -1,9 +1,5 @@
-
 import factory
 from faker.providers import BaseProvider, internet, job, lorem, person, python
-
-
-
 
 factory.Faker.add_provider(python)
 factory.Faker.add_provider(lorem)

@@ -5,7 +5,6 @@ from factory import Faker
 from factory.alchemy import SQLAlchemyModelFactory
 
 from api.dependencies import get_session
-
 from api.schemas.answer import Answer
 
 
@@ -19,14 +18,12 @@ class AnswerFactory(SQLAlchemyModelFactory):
     username: str = Faker(
         "pystr_format", string_format="????##", letters=string.ascii_lowercase
     )
-    question: int =Faker("pyint")
+    question: int = Faker("pyint")
     part: int = Faker("pyint")
     section: int = Faker("pyint")
     task: int = Faker("pyint")
     answer: str = Faker("text", max_nb_chars=277)
-    timestamp: datetime = Faker(
-        "date_this_year", before_today=True, after_today=False
-    )
+    timestamp: datetime = Faker("date_this_year", before_today=True, after_today=False)
 
     ip: str = Faker(
         "pystr_format", string_format="######", letters=string.ascii_lowercase

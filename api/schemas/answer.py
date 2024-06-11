@@ -1,9 +1,10 @@
 from datetime import datetime
+
 import sqlmodel
-from sqlmodel import SQLModel, Field
+from sqlmodel import Field, SQLModel
 
 
-class Answer(SQLModel,table=True):
+class Answer(SQLModel, table=True):
     id: int | None = Field(primary_key=True, default=None)
     exam_id: int = Field(default=None)  # TODO:: FK?
     username: str = Field(nullable=False)

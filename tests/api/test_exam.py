@@ -28,8 +28,7 @@ def test_can_get_question_for_exam(client):
 
 
 def test_can_get_answer_for_question_by_user(web_client, answer_factory):
-    answer = answer_factory.create_batch(
-        size=3,question=1, username="hpotter")
+    answer = answer_factory.create_batch(size=3, question=1, username="hpotter")
 
     # TODO user is hardcoded into query
 
@@ -37,8 +36,8 @@ def test_can_get_answer_for_question_by_user(web_client, answer_factory):
     assert res.status_code == 200
     assert len(res.json()) == 3
 
-    assert all(answer['question'] == 1 for answer in res.json())
-    assert all(answer['username'] == "hpotter" for answer in res.json())
+    assert all(answer["question"] == 1 for answer in res.json())
+    assert all(answer["username"] == "hpotter" for answer in res.json())
 
 
 def test_404_in_case_of_missing_question(client):
@@ -55,7 +54,7 @@ def test_can_get_summary_for_exam(client):
     assert summary["course_name"] == "The course name"
     assert summary["duration"] == 120
     assert (
-            summary["rubric"]["instructions"] == "Some general instructions for this exam."
+        summary["rubric"]["instructions"] == "Some general instructions for this exam."
     )
     assert summary["rubric"]["questions_to_answer"] == 3
     assert summary["begins"] == "2019-01-01T08:00:00Z"
