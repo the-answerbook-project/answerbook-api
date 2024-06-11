@@ -1,7 +1,7 @@
 from datetime import datetime
+from ipaddress import IPv4Address
 
 import sqlmodel
-from pydantic import AnyHttpUrl
 from sqlalchemy import Column
 from sqlalchemy.dialects.postgresql import INET
 from sqlmodel import Field, SQLModel
@@ -22,7 +22,7 @@ class Answer(SQLModel, table=True):
         )
     )
 
-    ip: AnyHttpUrl = Field(sa_column=Column(INET))
+    ip: IPv4Address = Field(sa_column=Column(INET))
 
 
 class AnswerRead(SQLModel):
