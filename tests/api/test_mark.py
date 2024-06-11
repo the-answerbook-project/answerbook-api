@@ -8,7 +8,7 @@ def test_can_get_user_marks_for_question(client, mark_feedback_factory):
     assert len(res.json()) == 3
 
 
-def test_response_answer_has_expected_fields(client, mark_feedback_factory):
+def test_response_mark_has_expected_fields(client, mark_feedback_factory):
     mark = mark_feedback_factory(exam_id="y2023_12345_exam", username="hpotter")
 
     res = client("y2023_12345_exam").get(f"/questions/{mark.question}/mark")
@@ -23,7 +23,7 @@ def test_response_answer_has_expected_fields(client, mark_feedback_factory):
     assert mark_["feedback"] == mark.feedback
 
 
-def test_gets_empty_list_response_if_no_answers_exist_for_assessment(client):
+def test_gets_empty_list_response_if_no_marks_exist_for_assessment(client):
     res = client("y2023_12345_exam").get("/questions/1/mark")
     assert res.status_code == 200
     assert len(res.json()) == 0
