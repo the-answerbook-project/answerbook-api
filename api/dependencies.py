@@ -30,10 +30,6 @@ def get_assessment_id() -> str:
     return "y2023_12345_exam"
 
 
-def get_assessment_id() -> str:
-    return "y2023_12345_exam"
-
-
 def get_assessment(
     settings=Depends(get_settings), assessment_id=Depends(get_assessment_id)
 ) -> Assessment:
