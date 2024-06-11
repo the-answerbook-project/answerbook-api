@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, asc, select
 from starlette.status import HTTP_404_NOT_FOUND
 
-from api.dependencies import get_assessment, get_session
+from api.dependencies import get_assessment, get_assessment_id, get_session
 from api.schemas.answer import Answer, AnswerRead
 from api.schemas.exam import Assessment, AssessmentSummary, Question
 
@@ -34,7 +34,7 @@ def get_question(
 
 @exam_router.get(
     "/questions/{question_number}/answer",
-    tags=["answer"],
+    tags=["answers"],
     response_model=list[AnswerRead],
     summary="Retrieve answer for question by user",
     description="""
@@ -44,10 +44,15 @@ Retrieve the given latest answer by a user including part, section, task.
 def get_answer(
     question_number: int,
     session: Session = Depends(get_session),
+    assessment_id: str = Depends(get_assessment_id),
 ):
     query = (
         select(Answer)
-        .where(Answer.question == question_number, Answer.username == "hpotter")
+        .where(
+            Answer.question == question_number,
+            Answer.exam_id == assessment_id,
+            Answer.username == "hpotter",
+        )
         .order_by(asc(Answer.part), asc(Answer.section), asc(Answer.task))
     )
     answers = session.exec(query).all()
