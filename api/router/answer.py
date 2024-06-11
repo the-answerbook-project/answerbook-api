@@ -13,7 +13,7 @@ answer_router = APIRouter()
     response_model=list[AnswerRead],
     summary="Retrieve answer for question by user",
     description="""
-Retrieve the given latest answer by a user including part, section, task.
+Retrieve the latest user answers to the given question's tasks.
 """,
 )
 def get_answer(
