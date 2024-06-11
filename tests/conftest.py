@@ -78,8 +78,3 @@ def client_fixture(app):
         return TestClient(app)
 
     return client_for_assessment
-
-
-@pytest.fixture(name="web_client")
-def web_client_fixture(app) -> TestClient:
-    return TestClient(app)
