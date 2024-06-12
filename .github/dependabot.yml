@@ -10,7 +10,5 @@ updates:
     rebase-strategy: "auto"
     schedule:
       interval: "weekly"
-    labels:
-      - "npm dependencies"
     reviewers:
       - "procaconsul"
