@@ -28,7 +28,6 @@ def get_marks_feedback_for_question_number(
 ):
     query = (
         select(MarkFeedback)
-        .outerjoin(MarkFeedbackHistory, MarkFeedback.id == MarkFeedbackHistory.mark_id)  # type: ignore
         .where(
             MarkFeedback.question == question_number,
             MarkFeedback.exam_id == assessment_id,
