@@ -44,7 +44,7 @@ def test_can_get_user_marks_and_marks_history_for_question(client, mark_factory)
     assert len(mark_["history"]) == 5
 
 
-def test_can_get_correct_history_mark(client, mark_factory):
+def test_mark_history_has_expected_fields(client, mark_factory):
     mark = mark_factory(
         exam_id="y2023_12345_exam", question=1, username="hpotter", with_history=1
     )
