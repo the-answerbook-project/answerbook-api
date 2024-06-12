@@ -36,7 +36,6 @@ class MarkHistory(SQLModel, table=True):
         )
     )
     marker: str = Field(nullable=False)
-
     mark_feedback: Mark = Relationship(back_populates="history")
 
 
