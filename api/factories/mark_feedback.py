@@ -13,6 +13,7 @@ class MarkFeedbackFactory(SQLAlchemyModelFactory):
     class Meta:
         model = MarkFeedback
         sqlalchemy_session = get_session()
+        sqlalchemy_session_persistence = "commit"
 
     exam_id: int = Faker("pystr_format", string_format="y####_#####_exam")
     username: str = Faker(
@@ -45,6 +46,7 @@ class MarkFeedbackHistoryFactory(SQLAlchemyModelFactory):
     class Meta:
         model = MarkFeedbackHistory
         sqlalchemy_session = get_session()
+        sqlalchemy_session_persistence = "commit"
 
     mark_id: int = Faker("pyint")
 
