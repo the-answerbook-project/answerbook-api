@@ -3,7 +3,7 @@ from starlette.middleware.cors import CORSMiddleware
 
 from api.router import api_router
 from api.router.exam import exam_router
-from api.router.mark import mark_router
+from api.router.mark import marks_router
 from api.router.questions import questions_router
 from api.settings import Settings
 
@@ -44,6 +44,6 @@ def create_application() -> FastAPI:
     rest_api.include_router(api_router)
     rest_api.include_router(exam_router)
     rest_api.include_router(questions_router)
-    rest_api.include_router(mark_router)
+    rest_api.include_router(marks_router)
 
     return rest_api
