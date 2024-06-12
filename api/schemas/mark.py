@@ -23,8 +23,6 @@ class Mark(SQLModel, table=True):
 
     history: list["MarkHistory"] = Relationship(back_populates="mark_feedback")
 
-    # TODO : Mark approved/submitted?
-
 
 class MarkHistory(SQLModel, table=True):
     id: int | None = Field(primary_key=True, default=None)
