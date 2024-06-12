@@ -1,7 +1,7 @@
 from datetime import datetime
 
 import sqlmodel
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, Relationship, SQLModel
 
 
 class MarkFeedback(SQLModel, table=True):
@@ -21,6 +21,8 @@ class MarkFeedback(SQLModel, table=True):
     )
     marker: str = Field(nullable=False)
 
+    history: list["MarkFeedbackHistory"] = Relationship(back_populates="mark_feedback")
+
     # TODO : Mark approved/submitted?
 
 
@@ -33,3 +35,19 @@ class MarkFeedbackRead(SQLModel):
     feedback: str
     marker: str
     timestamp: datetime
+
+
+class MarkFeedbackHistory(SQLModel, table=True):
+    id: int | None = Field(primary_key=True, default=None)
+    mark_id: int = Field(foreign_key="markfeedback.id")
+
+    mark: int = Field(nullable=True)  # TODO:: int or float?
+    feedback: str = Field(nullable=True)
+    timestamp: datetime = Field(
+        sa_column=sqlmodel.Column(
+            sqlmodel.DateTime(timezone=False),
+        )
+    )
+    marker: str = Field(nullable=False)
+
+    mark_feedback: MarkFeedback = Relationship(back_populates="history")
