@@ -1,7 +1,4 @@
-import pytest
-
-
-def test_can_get_user_marks_for_question(client, mark_factory):
+def test_can_get_student_marks_for_question(client, mark_factory):
     mark_factory.create_batch(
         size=3, exam_id="y2023_12345_exam", question=1, username="hpotter"
     )
@@ -32,7 +29,7 @@ def test_gets_empty_list_response_if_no_marks_exist_for_assessment(client):
     assert len(res.json()) == 0
 
 
-def test_can_get_user_marks_and_marks_history_for_question(client, mark_factory):
+def test_student_marks_include_mark_history(client, mark_factory):
     mark_factory(
         exam_id="y2023_12345_exam", question=1, username="hpotter", with_history=5
     )
