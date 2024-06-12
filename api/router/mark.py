@@ -29,11 +29,6 @@ def get_marks_feedback_for_question_number(
             Mark.exam_id == assessment_id,
             Mark.username == student_username,
         )
-        .order_by(
-            Mark.question,  # type: ignore
-            Mark.part,  # type: ignore
-            Mark.section,  # type: ignore
-            Mark.task,  # type: ignore
-        )  # type: ignore
+        .order_by(Mark.question, Mark.part, Mark.section, Mark.task)  # type: ignore
     )
     return session.exec(query).all()
