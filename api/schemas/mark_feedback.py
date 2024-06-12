@@ -37,9 +37,7 @@ class MarkFeedbackHistory(SQLModel, table=True):
             sqlmodel.DateTime(timezone=False),
         )
     )
-    marker: str = Field(
-        nullable=False
-    )  # TODO: assume marker can change in history? YES or no?
+    marker: str = Field(nullable=False)
 
     mark_feedback: MarkFeedback = Relationship(back_populates="history")
 

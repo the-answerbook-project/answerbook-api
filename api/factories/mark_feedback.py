@@ -15,7 +15,7 @@ class MarkFeedbackFactory(SQLAlchemyModelFactory):
         sqlalchemy_session = get_session()
         sqlalchemy_session_persistence = "commit"
 
-    exam_id: int = Faker("pystr_format", string_format="y####_#####_exam")
+    exam_id: str = Faker("pystr_format", string_format="y####_#####_exam")
     username: str = Faker(
         "pystr_format", string_format="????##", letters=string.ascii_lowercase
     )
@@ -47,8 +47,6 @@ class MarkFeedbackHistoryFactory(SQLAlchemyModelFactory):
         model = MarkFeedbackHistory
         sqlalchemy_session = get_session()
         sqlalchemy_session_persistence = "commit"
-
-    mark_id: int = Faker("pyint")
 
     mark: int = Faker("pyint")
     feedback: str = Faker("text", max_nb_chars=277)
