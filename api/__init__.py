@@ -14,14 +14,10 @@ tags_metadata = [
     },
     {
         "name": "exam",
-        "description": "Exam information",
+        "description": "Exam questions and information",
     },
     {
-        "name": "questions",
-        "description": "Exam questions",
-    },
-    {
-        "name": "marks",
+        "name": "marking",
         "description": "Exam marks",
     },
 ]
