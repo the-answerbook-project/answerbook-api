@@ -44,3 +44,20 @@ def test_can_get_user_marks_and_marks_history_for_question(
 
     [mark_] = res.json()
     assert len(mark_["history"]) == 5
+
+
+def test_can_get_correct_history_mark(client, mark_feedback_factory):
+    mark = mark_feedback_factory(
+        exam_id="y2023_12345_exam", question=1, username="hpotter", with_history=1
+    )
+
+    [history] = mark.history
+
+    res = client("y2023_12345_exam").get("/questions/1/mark")
+    assert res.status_code == 200
+
+    [history_] = res.json()[0]["history"]
+
+    assert history_["mark"] == history.mark
+    assert history_["feedback"] == history.feedback
+    assert history_["marker"] == history.marker
