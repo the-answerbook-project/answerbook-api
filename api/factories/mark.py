@@ -40,6 +40,9 @@ class MarkFactory(SQLAlchemyModelFactory):
                     MarkHistoryFactory(
                         mark_id=self.id,
                     )
+        if isinstance(history, list):
+            for h in history:
+                MarkHistoryFactory(mark_id=self.id, **h)
 
 
 class MarkHistoryFactory(SQLAlchemyModelFactory):
