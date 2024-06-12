@@ -6,12 +6,12 @@ from factory import Faker
 from factory.alchemy import SQLAlchemyModelFactory
 
 from api.dependencies import get_session
-from api.schemas.mark_feedback import MarkFeedback, MarkFeedbackHistory
+from api.schemas.mark import Mark, MarkHistory
 
 
 class MarkFeedbackFactory(SQLAlchemyModelFactory):
     class Meta:
-        model = MarkFeedback
+        model = Mark
         sqlalchemy_session = get_session()
         sqlalchemy_session_persistence = "commit"
 
@@ -32,7 +32,7 @@ class MarkFeedbackFactory(SQLAlchemyModelFactory):
 
     @factory.post_generation
     def with_history(
-        self: MarkFeedback, create: bool, history: int | list[dict], **kwargs
+        self: Mark, create: bool, history: int | list[dict], **kwargs
     ) -> None:
         if create and history:
             if isinstance(history, int):
@@ -44,7 +44,7 @@ class MarkFeedbackFactory(SQLAlchemyModelFactory):
 
 class MarkFeedbackHistoryFactory(SQLAlchemyModelFactory):
     class Meta:
-        model = MarkFeedbackHistory
+        model = MarkHistory
         sqlalchemy_session = get_session()
         sqlalchemy_session_persistence = "commit"
 

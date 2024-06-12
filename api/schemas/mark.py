@@ -4,7 +4,7 @@ import sqlmodel
 from sqlmodel import Field, Relationship, SQLModel
 
 
-class MarkFeedback(SQLModel, table=True):
+class Mark(SQLModel, table=True):
     id: int = Field(primary_key=True)
     exam_id: str = Field(default=None)
     username: str = Field(nullable=False)
@@ -21,14 +21,14 @@ class MarkFeedback(SQLModel, table=True):
     )
     marker: str = Field(nullable=False)
 
-    history: list["MarkFeedbackHistory"] = Relationship(back_populates="mark_feedback")
+    history: list["MarkHistory"] = Relationship(back_populates="mark_feedback")
 
     # TODO : Mark approved/submitted?
 
 
-class MarkFeedbackHistory(SQLModel, table=True):
+class MarkHistory(SQLModel, table=True):
     id: int | None = Field(primary_key=True, default=None)
-    mark_id: int = Field(foreign_key="markfeedback.id")
+    mark_id: int = Field(foreign_key="mark.id")
 
     mark: int = Field(nullable=True)  # TODO:: int or float?
     feedback: str = Field(nullable=True)
@@ -39,17 +39,17 @@ class MarkFeedbackHistory(SQLModel, table=True):
     )
     marker: str = Field(nullable=False)
 
-    mark_feedback: MarkFeedback = Relationship(back_populates="history")
+    mark_feedback: Mark = Relationship(back_populates="history")
 
 
-class MarkFeedbackHistoryRead(SQLModel):
+class MarkHistoryRead(SQLModel):
     mark: int
     feedback: str
     marker: str
     timestamp: datetime
 
 
-class MarkFeedbackRead(SQLModel):
+class MarkRead(SQLModel):
     question: int
     part: int
     section: int
@@ -58,4 +58,4 @@ class MarkFeedbackRead(SQLModel):
     feedback: str
     marker: str
     timestamp: datetime
-    history: list[MarkFeedbackHistoryRead]
+    history: list[MarkHistoryRead]
