@@ -12,7 +12,7 @@ class Mark(SQLModel, table=True):
     part: int = Field(default=None)
     section: int = Field(default=None)
     task: int = Field(default=None)
-    mark: int = Field(nullable=True)  # TODO:: int or float?
+    mark: float = Field(nullable=True)
     feedback: str = Field(nullable=True)
     timestamp: datetime = Field(
         sa_column=sqlmodel.Column(
@@ -30,7 +30,7 @@ class MarkHistory(SQLModel, table=True):
     id: int | None = Field(primary_key=True, default=None)
     mark_id: int = Field(foreign_key="mark.id")
 
-    mark: int = Field(nullable=True)  # TODO:: int or float?
+    mark: float = Field(nullable=True)  # TODO:: int or float?
     feedback: str = Field(nullable=True)
     timestamp: datetime = Field(
         sa_column=sqlmodel.Column(
@@ -43,7 +43,7 @@ class MarkHistory(SQLModel, table=True):
 
 
 class MarkHistoryRead(SQLModel):
-    mark: int
+    mark: float
     feedback: str
     marker: str
     timestamp: datetime
@@ -54,7 +54,7 @@ class MarkRead(SQLModel):
     part: int
     section: int
     task: int
-    mark: int
+    mark: float
     feedback: str
     marker: str
     timestamp: datetime
