@@ -9,7 +9,7 @@ from api.dependencies import get_session
 from api.schemas.mark import Mark, MarkHistory
 
 
-class MarkFeedbackFactory(SQLAlchemyModelFactory):
+class MarkFactory(SQLAlchemyModelFactory):
     class Meta:
         model = Mark
         sqlalchemy_session = get_session()
@@ -37,12 +37,12 @@ class MarkFeedbackFactory(SQLAlchemyModelFactory):
         if create and history:
             if isinstance(history, int):
                 for _ in range(history):
-                    MarkFeedbackHistoryFactory(
+                    MarkHistoryFactory(
                         mark_id=self.id,
                     )
 
 
-class MarkFeedbackHistoryFactory(SQLAlchemyModelFactory):
+class MarkHistoryFactory(SQLAlchemyModelFactory):
     class Meta:
         model = MarkHistory
         sqlalchemy_session = get_session()

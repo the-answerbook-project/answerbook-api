@@ -1,8 +1,8 @@
 import pytest
 
 
-def test_can_get_user_marks_for_question(client, mark_feedback_factory):
-    mark_feedback_factory.create_batch(
+def test_can_get_user_marks_for_question(client, mark_factory):
+    mark_factory.create_batch(
         size=3, exam_id="y2023_12345_exam", question=1, username="hpotter"
     )
 
@@ -11,8 +11,8 @@ def test_can_get_user_marks_for_question(client, mark_feedback_factory):
     assert len(res.json()) == 3
 
 
-def test_response_mark_has_expected_fields(client, mark_feedback_factory):
-    mark = mark_feedback_factory(exam_id="y2023_12345_exam", username="hpotter")
+def test_response_mark_has_expected_fields(client, mark_factory):
+    mark = mark_factory(exam_id="y2023_12345_exam", username="hpotter")
 
     res = client("y2023_12345_exam").get(f"/marks/hpotter")
     assert res.status_code == 200
@@ -32,10 +32,8 @@ def test_gets_empty_list_response_if_no_marks_exist_for_assessment(client):
     assert len(res.json()) == 0
 
 
-def test_can_get_user_marks_and_marks_history_for_question(
-    client, mark_feedback_factory
-):
-    mark_feedback_factory(
+def test_can_get_user_marks_and_marks_history_for_question(client, mark_factory):
+    mark_factory(
         exam_id="y2023_12345_exam", question=1, username="hpotter", with_history=5
     )
 
@@ -46,8 +44,8 @@ def test_can_get_user_marks_and_marks_history_for_question(
     assert len(mark_["history"]) == 5
 
 
-def test_can_get_correct_history_mark(client, mark_feedback_factory):
-    mark = mark_feedback_factory(
+def test_can_get_correct_history_mark(client, mark_factory):
+    mark = mark_factory(
         exam_id="y2023_12345_exam", question=1, username="hpotter", with_history=1
     )
 
