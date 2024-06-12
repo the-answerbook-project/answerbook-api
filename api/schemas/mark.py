@@ -21,7 +21,7 @@ class Mark(SQLModel, table=True):
     )
     marker: str = Field(nullable=False)
 
-    history: list["MarkHistory"] = Relationship(back_populates="mark_feedback")
+    history: list["MarkHistory"] = Relationship(back_populates="current_mark")
 
 
 class MarkHistory(SQLModel, table=True):
@@ -36,7 +36,7 @@ class MarkHistory(SQLModel, table=True):
         )
     )
     marker: str = Field(nullable=False)
-    mark_feedback: Mark = Relationship(back_populates="history")
+    current_mark: Mark = Relationship(back_populates="history")
 
 
 class MarkHistoryRead(SQLModel):
