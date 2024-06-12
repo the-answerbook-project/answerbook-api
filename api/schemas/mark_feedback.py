@@ -5,7 +5,7 @@ from sqlmodel import Field, Relationship, SQLModel
 
 
 class MarkFeedback(SQLModel, table=True):
-    id: int | None = Field(primary_key=True, default=None)
+    id: int = Field(primary_key=True)
     exam_id: str = Field(default=None)
     username: str = Field(nullable=False)
     question: int = Field(default=None)
@@ -26,17 +26,6 @@ class MarkFeedback(SQLModel, table=True):
     # TODO : Mark approved/submitted?
 
 
-class MarkFeedbackRead(SQLModel):
-    question: int
-    part: int
-    section: int
-    task: int
-    mark: int
-    feedback: str
-    marker: str
-    timestamp: datetime
-
-
 class MarkFeedbackHistory(SQLModel, table=True):
     id: int | None = Field(primary_key=True, default=None)
     mark_id: int = Field(foreign_key="markfeedback.id")
@@ -53,3 +42,22 @@ class MarkFeedbackHistory(SQLModel, table=True):
     )  # TODO: assume marker can change in history? YES or no?
 
     mark_feedback: MarkFeedback = Relationship(back_populates="history")
+
+
+class MarkFeedbackHistoryRead(SQLModel):
+    mark: int
+    feedback: str
+    marker: str
+    timestamp: datetime
+
+
+class MarkFeedbackRead(SQLModel):
+    question: int
+    part: int
+    section: int
+    task: int
+    mark: int
+    feedback: str
+    marker: str
+    timestamp: datetime
+    history: list[MarkFeedbackHistoryRead]
