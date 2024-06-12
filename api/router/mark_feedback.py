@@ -2,7 +2,11 @@ from fastapi import APIRouter, Depends
 from sqlmodel import Session, select
 
 from api.dependencies import get_assessment_id, get_session
-from api.schemas.mark_feedback import MarkFeedback, MarkFeedbackRead
+from api.schemas.mark_feedback import (
+    MarkFeedback,
+    MarkFeedbackHistory,
+    MarkFeedbackRead,
+)
 
 mark_feedback_router = APIRouter(
     prefix="/questions/{question_number}", tags=["marking"]
@@ -24,6 +28,7 @@ def get_marks_feedback_for_question_number(
 ):
     query = (
         select(MarkFeedback)
+        .outerjoin(MarkFeedbackHistory, MarkFeedback.id == MarkFeedbackHistory.mark_id)  # type: ignore
         .where(
             MarkFeedback.question == question_number,
             MarkFeedback.exam_id == assessment_id,
