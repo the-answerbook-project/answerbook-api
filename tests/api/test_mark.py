@@ -32,7 +32,6 @@ def test_gets_empty_list_response_if_no_marks_exist_for_assessment(client):
     assert len(res.json()) == 0
 
 
-@pytest.mark.skip(reason="mark_id does not get generated when calling for history")
 def test_can_get_user_marks_and_marks_history_for_question(
     client, mark_feedback_factory
 ):
