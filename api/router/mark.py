@@ -18,7 +18,7 @@ marks_router = APIRouter(prefix="/marks", tags=["marking"])
 Retrieve the latest (and historical) marks for answers to a question by user
 """,
 )
-def get_marks_feedback_for_question_number(
+def get_marks_for_question(
     student_username: str,
     session: Session = Depends(get_session),
     assessment_id: str = Depends(get_assessment_id),
