@@ -7,10 +7,10 @@ from api.schemas.mark import (
     MarkRead,
 )
 
-mark_feedback_router = APIRouter(prefix="/marks", tags=["marking"])
+mark_router = APIRouter(prefix="/marks", tags=["marking"])
 
 
-@mark_feedback_router.get(
+@mark_router.get(
     "/{student_username}",
     response_model=list[MarkRead],
     summary="Retrieve user marks and feedback for question",
