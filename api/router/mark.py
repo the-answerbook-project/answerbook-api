@@ -13,7 +13,7 @@ marks_router = APIRouter(prefix="/marks", tags=["marking"])
 @marks_router.get(
     "/{student_username}",
     response_model=list[MarkRead],
-    summary="Retrieve user marks and feedback for question",
+    summary="Retrieve user marks and feedback for exam questions",
     description="""
 Retrieve the latest (and historical) marks for answers to a question by user
 """,
