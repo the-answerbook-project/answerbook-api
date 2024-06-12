@@ -19,7 +19,6 @@ Retrieve the latest (and historical) marks for answers to a question by user
 """,
 )
 def get_marks_feedback_for_question_number(
-    # question_number: int,
     student_username: str,
     session: Session = Depends(get_session),
     assessment_id: str = Depends(get_assessment_id),
