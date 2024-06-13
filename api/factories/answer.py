@@ -17,10 +17,10 @@ class AnswerFactory(SQLAlchemyModelFactory):
     username: str = Faker(
         "pystr_format", string_format="????##", letters=string.ascii_lowercase
     )
-    question: int = Faker("pyint")
-    part: int = Faker("pyint")
-    section: int = Faker("pyint")
-    task: int = Faker("pyint")
+    question: int = Faker("pyint", min_value=1, max_value=10)
+    part: int = Faker("pyint", min_value=1, max_value=10)
+    section: int = Faker("pyint", min_value=1, max_value=20)
+    task: int = Faker("pyint", min_value=1, max_value=20)
     answer: str = Faker("text", max_nb_chars=277)
     timestamp: datetime = Faker("date_this_year", before_today=True, after_today=False)
     ip: str = Faker("ipv4")
