@@ -3,7 +3,7 @@ from starlette.middleware.cors import CORSMiddleware
 
 from api.router import api_router
 from api.router.exam import exam_router
-from api.router.mark import marking_router
+from api.router.marking import marking_router
 from api.router.questions import questions_router
 from api.settings import Settings
 
