@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
 from api.router import api_router
+from api.router.answers import answer_router
 from api.router.exam import exam_router
 from api.router.mark import marks_router
 from api.router.questions import questions_router
@@ -19,6 +20,10 @@ tags_metadata = [
     {
         "name": "marking",
         "description": "Exam marks",
+    },
+    {
+        "name": "answers",
+        "description": "Exam answers",
     },
 ]
 
@@ -49,5 +54,6 @@ def create_application() -> FastAPI:
     rest_api.include_router(exam_router)
     rest_api.include_router(questions_router)
     rest_api.include_router(marks_router)
+    rest_api.include_router(answer_router)
 
     return rest_api
