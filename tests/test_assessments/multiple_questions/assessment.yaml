@@ -1,0 +1,48 @@
+course code: 11111
+course name: The course name
+alternative codes:
+  - 22222
+  - 33333
+begins: 2019-01-01T08:00:00Z
+duration: 120
+upload time: 30
+extensions:
+  username1: 20 minutes
+  username2: 13 minutes
+  username3: 25 minutes
+labelled subparts: true
+rubric:
+  instructions: Some general instructions for this exam.
+  questions to answer: 3
+
+1:
+  title: Title of the first question
+  instructions: Some instructions for this question.
+  show part weights: false
+  a:
+    show subpart weights: false
+    instructions: Some instructions for this part.
+    i:
+      instructions: Some instructions for this section.
+      maximum mark: 10
+      tasks:
+        - type: essay
+          lines: 5
+        - instructions: Some instructions for this task.
+          type: multiple choice select one
+          choices:
+            - a: "Red pill"
+            - b: "Blue pill"
+2:
+  title: Title of the second question
+  instructions: Some instructions for this question.
+  show part weights: true
+  a:
+    show subpart weights: true
+    instructions: Some instructions for this part.
+    i:
+      instructions: Some instructions for this section.
+      maximum mark: 5
+      tasks:
+        - type: code
+          lines: 5
