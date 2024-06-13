@@ -21,10 +21,6 @@ tags_metadata = [
         "name": "marking",
         "description": "Exam marks",
     },
-    {
-        "name": "answers",
-        "description": "Exam answers",
-    },
 ]
 
 

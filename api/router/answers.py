@@ -4,7 +4,7 @@ from sqlmodel import Session, select
 from api.dependencies import get_assessment_id, get_session
 from api.schemas.answer import Answer, AnswerRead
 
-answer_router = APIRouter(prefix="/answers", tags=["answers"])
+answer_router = APIRouter(prefix="/answers", tags=["exam"])
 
 
 @answer_router.get(
