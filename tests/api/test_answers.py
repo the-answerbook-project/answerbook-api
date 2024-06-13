@@ -3,6 +3,6 @@ def test_can_get_all_student_answers_for_exam(client, answer_factory):
         size=5, exam_id="y2023_12345_exam", question=1, username="hpotter"
     )
 
-    res = client("y2023_12345_exam").get("/answers/hpotter")
+    res = client("y2023_12345_exam").get("/hpotter/answers")
     assert res.status_code == 200
     assert len(res.json()) == 5
