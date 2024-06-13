@@ -17,7 +17,6 @@ def test_response_mark_has_expected_fields(client, mark_factory):
     assert mark_["question"] == mark.question
     assert mark_["part"] == mark.part
     assert mark_["section"] == mark.section
-    assert mark_["task"] == mark.task
     assert mark_["mark"] == mark.mark
     assert mark_["marker"] == mark.marker
     assert mark_["feedback"] == mark.feedback

@@ -22,7 +22,6 @@ class MarkFactory(SQLAlchemyModelFactory):
     question: int = Faker("pyint")
     part: int = Faker("pyint")
     section: int = Faker("pyint")
-    task: int = Faker("pyint")
     mark: int = Faker("pyint")
     feedback: str = Faker("text", max_nb_chars=277)
     timestamp: datetime = Faker("date_this_year", before_today=True, after_today=False)

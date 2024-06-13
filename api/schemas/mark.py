@@ -11,7 +11,6 @@ class Mark(SQLModel, table=True):
     question: int = Field(default=None)
     part: int = Field(default=None)
     section: int = Field(default=None)
-    task: int = Field(default=None)
     mark: float = Field(nullable=True)
     feedback: str = Field(nullable=True)
     timestamp: datetime = Field(
@@ -50,7 +49,6 @@ class MarkRead(SQLModel):
     question: int
     part: int
     section: int
-    task: int
     mark: float
     feedback: str
     marker: str

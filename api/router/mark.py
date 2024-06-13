@@ -29,6 +29,6 @@ def get_marks_for_question(
             Mark.exam_id == assessment_id,
             Mark.username == student_username,
         )
-        .order_by(Mark.question, Mark.part, Mark.section, Mark.task)  # type: ignore
+        .order_by(Mark.question, Mark.part, Mark.section)  # type: ignore
     )
     return session.exec(query).all()
