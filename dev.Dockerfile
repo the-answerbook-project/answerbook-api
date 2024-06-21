@@ -8,4 +8,4 @@ COPY pyproject.toml /api/
 
 WORKDIR /api
 RUN pip install poetry
-RUN poetry config virtualenvs.create false && poetry install --no-root --no-interaction --no-ansi
+RUN poetry install --no-root --no-interaction --no-ansi
