@@ -24,6 +24,7 @@ class Mark(SQLModel, table=True):
 
 
 class MarkHistory(SQLModel, table=True):
+    __tablename__ = "mark_history"
     id: int | None = Field(primary_key=True, default=None)
     mark_id: int = Field(foreign_key="mark.id")
 
@@ -39,8 +40,8 @@ class MarkHistory(SQLModel, table=True):
 
 
 class MarkHistoryRead(SQLModel):
-    mark: float
-    feedback: str
+    mark: float | None
+    feedback: str | None
     marker: str
     timestamp: datetime
 
@@ -49,8 +50,8 @@ class MarkRead(SQLModel):
     question: int
     part: int
     section: int
-    mark: float
-    feedback: str
+    mark: float | None
+    feedback: str | None
     marker: str
     timestamp: datetime
     history: list[MarkHistoryRead]
