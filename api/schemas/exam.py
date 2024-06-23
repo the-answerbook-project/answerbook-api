@@ -4,6 +4,7 @@ from enum import StrEnum, auto
 from pydantic import field_validator, model_validator
 from sqlmodel import SQLModel
 
+from api.schemas import BaseSchema
 from api.utils import (
     is_lowercase_roman_numeral,
     is_single_lowercase_alpha,
@@ -120,7 +121,7 @@ class Assessment(SQLModel):
         return values
 
 
-class AssessmentSummary(SQLModel):
+class AssessmentSummary(BaseSchema):
     course_code: str
     course_name: str
     begins: datetime

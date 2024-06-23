@@ -5,10 +5,10 @@ from sqlmodel import Session, select
 from starlette import status
 
 from api.dependencies import get_assessment_id, get_session
-from api.schemas.answer import Answer, AnswerRead
+from api.models.answer import Answer
+from api.models.mark import Mark, MarkHistory
+from api.schemas.answer import AnswerRead
 from api.schemas.mark import (
-    Mark,
-    MarkHistory,
     MarkRead,
     MarkWrite,
 )

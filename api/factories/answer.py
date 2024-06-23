@@ -5,7 +5,7 @@ from factory import Faker
 from factory.alchemy import SQLAlchemyModelFactory
 
 from api.dependencies import get_session
-from api.schemas.answer import Answer
+from api.models.answer import Answer
 
 
 class AnswerFactory(SQLAlchemyModelFactory):

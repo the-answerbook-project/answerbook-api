@@ -6,7 +6,7 @@ from factory import Faker
 from factory.alchemy import SQLAlchemyModelFactory
 
 from api.dependencies import get_session
-from api.schemas.mark import Mark, MarkHistory
+from api.models.mark import Mark, MarkHistory
 
 
 class MarkFactory(SQLAlchemyModelFactory):

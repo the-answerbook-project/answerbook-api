@@ -3,7 +3,8 @@ from sqlmodel import Session, select
 from starlette.status import HTTP_404_NOT_FOUND
 
 from api.dependencies import get_assessment, get_assessment_id, get_session
-from api.schemas.answer import Answer, AnswerRead
+from api.models.answer import Answer
+from api.schemas.answer import AnswerRead
 from api.schemas.exam import Assessment, Question
 
 questions_router = APIRouter(prefix="/questions/{question_number}", tags=["exam"])

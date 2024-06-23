@@ -12,7 +12,7 @@ def test_can_get_summary_for_exam(client):
         summary["rubric"]["instructions"] == "Some general instructions for this exam."
     )
     assert summary["rubric"]["questions_to_answer"] == 3
-    assert summary["begins"] == "2019-01-01T08:00:00Z"
+    assert summary["begins"] == "2019-01-01T08:00:00+00:00"
 
 
 @pytest.mark.parametrize(
