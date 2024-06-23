@@ -31,7 +31,12 @@ def upgrade() -> None:
         sa.Column("section", sa.Integer(), nullable=False),
         sa.Column("mark", sa.Float(), nullable=True),
         sa.Column("feedback", sqlmodel.sql.sqltypes.AutoString(), nullable=True),
-        sa.Column("timestamp", sa.DateTime(), nullable=True),
+        sa.Column(
+            "timestamp",
+            sa.DateTime(),
+            server_default=sa.text("timezone('UTC', CURRENT_TIMESTAMP)"),
+            nullable=False,
+        ),
         sa.Column("marker", sqlmodel.sql.sqltypes.AutoString(), nullable=False),
         sa.PrimaryKeyConstraint("id"),
     )
@@ -41,7 +46,12 @@ def upgrade() -> None:
         sa.Column("mark_id", sa.Integer(), nullable=False),
         sa.Column("mark", sa.Float(), nullable=True),
         sa.Column("feedback", sqlmodel.sql.sqltypes.AutoString(), nullable=True),
-        sa.Column("timestamp", sa.DateTime(), nullable=True),
+        sa.Column(
+            "timestamp",
+            sa.DateTime(),
+            server_default=sa.text("timezone('UTC', CURRENT_TIMESTAMP)"),
+            nullable=False,
+        ),
         sa.Column("marker", sqlmodel.sql.sqltypes.AutoString(), nullable=False),
         sa.ForeignKeyConstraint(
             ["mark_id"],

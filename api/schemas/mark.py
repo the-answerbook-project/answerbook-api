@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import sqlmodel
+from sqlalchemy import func
 from sqlmodel import Field, Relationship, SQLModel
 
 
@@ -16,6 +17,8 @@ class Mark(SQLModel, table=True):
     timestamp: datetime = Field(
         sa_column=sqlmodel.Column(
             sqlmodel.DateTime(timezone=False),
+            server_default=func.timezone("UTC", func.current_timestamp()),
+            nullable=False,
         )
     )
     marker: str = Field(nullable=False)
@@ -28,11 +31,13 @@ class MarkHistory(SQLModel, table=True):
     id: int | None = Field(primary_key=True, default=None)
     mark_id: int = Field(foreign_key="mark.id")
 
-    mark: float = Field(nullable=True)  # TODO:: int or float?
+    mark: float = Field(nullable=True)
     feedback: str = Field(nullable=True)
     timestamp: datetime = Field(
         sa_column=sqlmodel.Column(
             sqlmodel.DateTime(timezone=False),
+            server_default=func.timezone("UTC", func.current_timestamp()),
+            nullable=False,
         )
     )
     marker: str = Field(nullable=False)
