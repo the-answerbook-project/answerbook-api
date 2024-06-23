@@ -1,8 +1,8 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 import sqlmodel
 from sqlalchemy import func
-from sqlmodel import Field, Relationship, SQLModel
+from sqlmodel import Column, DateTime, Field, Relationship, SQLModel
 
 
 class Mark(SQLModel, table=True):
@@ -15,8 +15,8 @@ class Mark(SQLModel, table=True):
     mark: float = Field(nullable=True)
     feedback: str = Field(nullable=True)
     timestamp: datetime = Field(
-        sa_column=sqlmodel.Column(
-            sqlmodel.DateTime(timezone=False),
+        sa_column=Column(
+            DateTime,
             server_default=func.timezone("UTC", func.current_timestamp()),
             nullable=False,
         )
@@ -34,8 +34,8 @@ class MarkHistory(SQLModel, table=True):
     mark: float = Field(nullable=True)
     feedback: str = Field(nullable=True)
     timestamp: datetime = Field(
-        sa_column=sqlmodel.Column(
-            sqlmodel.DateTime(timezone=False),
+        sa_column=Column(
+            DateTime,
             server_default=func.timezone("UTC", func.current_timestamp()),
             nullable=False,
         )
@@ -50,6 +50,13 @@ class MarkHistoryRead(SQLModel):
     marker: str
     timestamp: datetime
 
+    class Config:
+        json_encoders = {
+            datetime: lambda dt: (
+                dt.replace(tzinfo=timezone.utc).isoformat() if dt else None
+            ),
+        }
+
 
 class MarkRead(SQLModel):
     question: int
@@ -60,3 +67,18 @@ class MarkRead(SQLModel):
     marker: str
     timestamp: datetime
     history: list[MarkHistoryRead]
+
+    class Config:
+        json_encoders = {
+            datetime: lambda dt: (
+                dt.replace(tzinfo=timezone.utc).isoformat() if dt else None
+            ),
+        }
+
+
+class MarkWrite(SQLModel):
+    question: int
+    part: int
+    section: int
+    mark: float | None = None
+    feedback: str | None = None
