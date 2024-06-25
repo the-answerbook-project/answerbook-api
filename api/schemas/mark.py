@@ -6,6 +6,7 @@ from api.schemas import BaseSchema
 
 
 class MarkHistoryRead(BaseSchema):
+    id: int
     mark: float | None
     feedback: str | None
     marker: str
@@ -13,6 +14,7 @@ class MarkHistoryRead(BaseSchema):
 
 
 class MarkRead(BaseSchema):
+    id: int
     question: int
     part: int
     section: int
