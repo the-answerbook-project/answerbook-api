@@ -1,11 +1,15 @@
 # API endpoint for Answerbook version 2.
 
 ## How to run the API via a command line for development
-
-1. Clone this repository
-2. Access directory via terminal and type
+1. Clone this repository & `cd` into it
+2. Ensure you are on python 3.12 - we recommend using `pyenv` to manage python versions:
+```pyenv install 3.12```
+```pyenv local 3.12```
+4. Install dependencies using `poetry`:
 ```poetry install```
 ```poetry shell```
+5. If you are going to contribute, please install the pre-commit hooks:
+```pre-commit install```
 
 The above commands download and install
 the required libraries for the project and activate the
