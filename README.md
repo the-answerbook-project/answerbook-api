@@ -1,5 +1,11 @@
 # API endpoint for Answerbook version 2.
 
+## Running tests
+To run tests independent of your setup, do:
+```shell
+docker compose run tests
+```
+
 ## How to run the API via a command line for development
 1. Clone this repository & `cd` into it
 2. Ensure you are on python 3.12 - we recommend using `pyenv` to manage python versions:

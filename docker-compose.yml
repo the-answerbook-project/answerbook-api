@@ -1,0 +1,26 @@
+services:
+  tests:
+    image: api
+    build:
+      context: ../answerbook-api
+      dockerfile: dev.Dockerfile
+    command: poetry run pytest
+    environment:
+      - TEST_DB_SERVER_URL=postgresql://user:pass@db
+    volumes:
+      - ../answerbook-api:/api
+    depends_on:
+      - db
+
+  # add db
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: test-answerbook
+    volumes:
+      - answerbook-api-pgdata:/var/lib/postgresql/data
+
+volumes:
+  answerbook-api-pgdata:
