@@ -12,8 +12,10 @@ class AnswerFactory(SQLAlchemyModelFactory):
     class Meta:
         model = Answer
         sqlalchemy_session = get_session()
+        sqlalchemy_session_persistence = "commit"
 
-    exam_id: int = Faker("pystr_format", string_format="y####_#####_exam")
+
+    exam_id: str = Faker("pystr_format", string_format="y####_#####_exam")
     username: str = Faker(
         "pystr_format", string_format="????##", letters=string.ascii_lowercase
     )
