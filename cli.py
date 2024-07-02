@@ -5,9 +5,8 @@ from sqlalchemy import text
 from sqlmodel import SQLModel
 from typer import Argument
 
-
 from api.dependencies import get_session
-from api.factories import all_factories, StudentFactory, AnswerFactory
+from api.factories import AnswerFactory, StudentFactory, all_factories
 
 cli = typer.Typer()
 
@@ -49,6 +48,7 @@ def populate_db(
     """
     with dynamic_session():
         StudentFactory(username="hpotter")
+        StudentFactory(username="hgranger")
         AnswerFactory(username="hpotter", question=1, part=1, section=1)
     print("Database populated successfully.")
 
