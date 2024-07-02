@@ -47,9 +47,9 @@ def populate_db(
     Populates the database with dummy data.
     """
     with dynamic_session():
-        StudentFactory(username="hpotter")
-        StudentFactory(username="hgranger")
-        AnswerFactory(username="hpotter", question=1, part=1, section=1)
+        # StudentFactory(username="hpotter")
+        StudentFactory(username="hgranger", exam_id="y2023_12345_exam")
+        # AnswerFactory(username="hpotter", question=1, part=1, section=1)
     print("Database populated successfully.")
 
 

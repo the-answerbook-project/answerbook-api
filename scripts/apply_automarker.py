@@ -1,23 +1,6 @@
-from enum import auto
 from typing import Callable
 
 import requests
-
-
-def zero_automarker(tasks) -> tuple[int, str] | None:
-    if not tasks:
-        return (0, "Not attempted. Your paper shall be burned in the next class.")
-    return None
-
-
-def main():
-    mark_students(
-        question_no=1,
-        part_no=1,
-        section_no=2,
-        exam_id="y2023_12345_exam",
-        automarker=zero_automarker,
-    )
 
 
 def mark_students(
@@ -27,8 +10,8 @@ def mark_students(
     exam_id: str,
     automarker: Callable[[dict], tuple[int, str] | None],
 ):
-    res = get_students()
-    students = res.json()
+    students = get_students()
+
     for student in students:
         tasks = get_student_answer(student, question_no, part_no, section_no, exam_id)
 
@@ -43,8 +26,7 @@ def get_student_answer(student, question_no, part_no, section_no, exam_id):
     res = requests.get(
         f"http://localhost:5004/answers/{student['username']}/question/{question_no}/part/{part_no}/section/{section_no}"
     )
-    tasks = res.json()
-    return tasks
+    return res.json()
 
 
 def post_feedback(student, mark, feedback, question_no, part_no, section_no):
@@ -62,8 +44,4 @@ def post_feedback(student, mark, feedback, question_no, part_no, section_no):
 
 def get_students():
     res = requests.get("http://localhost:5004/students")
-    return res
-
-
-if __name__ == "__main__":
-    main()
+    return res.json()
