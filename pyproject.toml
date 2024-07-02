@@ -16,6 +16,8 @@ sqlmodel = "^0.0.19"
 sqlalchemy-utils = "^0.41.2"
 types-pyyaml = "^6.0.12.20240311"
 alembic = "^1.13.1"
+requests = "^2.32.3"
+types-requests = "^2.32.0.20240622"
 
 
 [tool.poetry.group.dev.dependencies]
