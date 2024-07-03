@@ -1,6 +1,7 @@
 from typing import Callable
 
 import typer
+from ai_automarker import make_description_automarker
 from apply_automarker import mark_students
 from typer import Argument, Option
 
@@ -17,8 +18,11 @@ def automark(
 ):
     match automarker_name:
         case "keyword":
-            keyword = typer.prompt("Enter the keyword:")
+            keyword = typer.prompt("Enter the keyword")
             automarker = make_keyword_automarker(keyword)
+        case "description":
+            question_text = typer.prompt("Enter the question")
+            automarker = make_description_automarker(question_text)
         case _:
             if automarker_name not in AUTOMARKERS:
                 typer.echo(f"Automarker '{automarker_name}' not found.")
