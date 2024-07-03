@@ -74,4 +74,10 @@ def test_can_upload_answers(client):
             }
         ],
     )
-    assert res.status_code == 200
+
+    # Check DB
+    res_ans = client("y2023_12345_exam").get("/questions/1/answer")
+    assert res_ans.status_code == 200
+    [answer_] = res_ans.json()
+    assert res_ans.status_code == 200
+    assert answer_["answer"] == "This is an answer"
