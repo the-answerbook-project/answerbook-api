@@ -49,20 +49,104 @@ def populate_db(
     with dynamic_session():
         StudentFactory(username="hgranger", exam_id="y2023_12345_exam")
         StudentFactory(username="hpotter", exam_id="y2023_12345_exam")
-        AnswerFactory(username="hpotter", question=1, part=1, section=1, task=1)
-        AnswerFactory(username="hpotter", question=1, part=1, section=1, task=2)
-        AnswerFactory(username="hpotter", question=1, part=1, section=1, task=3)
-        AnswerFactory(username="hpotter", question=2, part=1, section=1, task=1)
-        AnswerFactory(username="hpotter", question=2, part=1, section=1, task=1)
-        AnswerFactory(username="hpotter", question=3, part=1, section=1, task=1)
+        AnswerFactory(
+            exam_id="y2023_12345_exam",
+            username="hpotter",
+            question=1,
+            part=1,
+            section=1,
+            task=1,
+        )
+        AnswerFactory(
+            exam_id="y2023_12345_exam",
+            username="hpotter",
+            question=1,
+            part=1,
+            section=1,
+            task=2,
+        )
+        AnswerFactory(
+            exam_id="y2023_12345_exam",
+            username="hpotter",
+            question=1,
+            part=1,
+            section=1,
+            task=3,
+        )
+        AnswerFactory(
+            exam_id="y2023_12345_exam",
+            username="hpotter",
+            question=2,
+            part=1,
+            section=1,
+            task=1,
+        )
+        AnswerFactory(
+            exam_id="y2023_12345_exam",
+            username="hpotter",
+            question=2,
+            part=1,
+            section=1,
+            task=1,
+        )
+        AnswerFactory(
+            exam_id="y2023_12345_exam",
+            username="hpotter",
+            question=3,
+            part=1,
+            section=1,
+            task=1,
+        )
 
         StudentFactory(username="hgranger", exam_id="y2023_12345_exam")
-        AnswerFactory(username="hgranger", question=1, part=1, section=1, task=1)
-        AnswerFactory(username="hgranger", question=1, part=1, section=1, task=2)
-        AnswerFactory(username="hgranger", question=1, part=1, section=1, task=3)
-        AnswerFactory(username="hgranger", question=2, part=1, section=1, task=1)
-        AnswerFactory(username="hgranger", question=2, part=1, section=1, task=1)
-        AnswerFactory(username="hgranger", question=3, part=1, section=1, task=1)
+        AnswerFactory(
+            exam_id="y2023_12345_exam",
+            username="hgranger",
+            question=1,
+            part=1,
+            section=1,
+            task=1,
+        )
+        AnswerFactory(
+            exam_id="y2023_12345_exam",
+            username="hgranger",
+            question=1,
+            part=1,
+            section=1,
+            task=2,
+        )
+        AnswerFactory(
+            exam_id="y2023_12345_exam",
+            username="hgranger",
+            question=1,
+            part=1,
+            section=1,
+            task=3,
+        )
+        AnswerFactory(
+            exam_id="y2023_12345_exam",
+            username="hgranger",
+            question=2,
+            part=1,
+            section=1,
+            task=1,
+        )
+        AnswerFactory(
+            exam_id="y2023_12345_exam",
+            username="hgranger",
+            question=2,
+            part=1,
+            section=1,
+            task=1,
+        )
+        AnswerFactory(
+            exam_id="y2023_12345_exam",
+            username="hgranger",
+            question=3,
+            part=1,
+            section=1,
+            task=1,
+        )
     print("Database populated successfully.")
 
 
