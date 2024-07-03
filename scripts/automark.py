@@ -1,7 +1,7 @@
 from typing import Callable
 
 import typer
-from ai_automarker import make_description_automarker
+from ai_automarker import make_prompt_automarker, make_value_explanation_automarker
 from apply_automarker import mark_students
 from typer import Argument, Option
 
@@ -21,8 +21,13 @@ def automark(
             keyword = typer.prompt("Enter the keyword")
             automarker = make_keyword_automarker(keyword)
         case "description":
-            question_text = typer.prompt("Enter the question")
-            automarker = make_description_automarker(question_text)
+            prompt = typer.prompt("Enter the prompt")
+            automarker = make_prompt_automarker(prompt, 10)
+        case "val-explain":
+            prompt = typer.prompt("Enter the prompt")
+            # prompt = "Describe what type of flow given your Re value"
+            model_ans = float(typer.prompt("Enter the model answer"))
+            automarker = make_value_explanation_automarker(prompt, model_ans)
         case _:
             if automarker_name not in AUTOMARKERS:
                 typer.echo(f"Automarker '{automarker_name}' not found.")
@@ -93,10 +98,36 @@ def prime_number_automarker(tasks) -> tuple[int, str] | None:
     return (mark, feedback.strip() or "Good job! You have entered a prime number.")
 
 
+# combining automarkers
+
+
+def combination_automarker(tasks):
+    sum = 0
+    feedback = ""
+
+    prompt_automarker = make_prompt_automarker(
+        "Explain what two things cause a rainbow to form.", 5
+    )
+    res1 = prompt_automarker(tasks)
+    if res1 is not None:
+        (sum1, feedback1) = res1
+        sum += sum1
+        feedback += feedback1
+
+    res2 = rainbow_automarker(tasks[1:])
+    if res2 is not None:
+        (sum2, feedback2) = res2
+        sum += sum2
+        feedback += feedback2
+
+    return (sum, feedback)
+
+
 AUTOMARKERS = {
     "zero": zero_automarker,
     "rainbow": rainbow_automarker,
     "prime_number": prime_number_automarker,
+    "combination": combination_automarker,
 }
 
 if __name__ == "__main__":
