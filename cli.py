@@ -150,5 +150,23 @@ def populate_db(
     print("Database populated successfully.")
 
 
+@cli.command(name="populate_demo")
+def populate_demo_data():
+    """
+    Populates the database with dummy data.
+    """
+
+    with dynamic_session():
+        StudentFactory(username="hgranger", exam_id="y2023_12345_exam")
+        StudentFactory(username="hpotter", exam_id="y2023_12345_exam")
+        StudentFactory(username="rweasley", exam_id="y2023_12345_exam")
+        StudentFactory(username="kss22", exam_id="y2023_12345_exam")
+        StudentFactory(username="bn322", exam_id="y2023_12345_exam")
+        StudentFactory(username="ma4723", exam_id="y2023_12345_exam")
+        StudentFactory(username="ab1223", exam_id="y2023_12345_exam")
+
+    print("Demo data populated Database populated successfully.")
+
+
 if __name__ == "__main__":
     cli()
