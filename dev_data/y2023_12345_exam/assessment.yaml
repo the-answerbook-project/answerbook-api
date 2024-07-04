@@ -19,91 +19,91 @@ rubric:
   questions to answer: 3
 
 1:
-  title: Title of the question
+  title: General Knowledge
   show part weights: true
   instructions: |
-    In the Star Wars universe, there exist many different lightsabers, mainly due to the different *kyber* crystals used during their crafting.
+    Are you as smart as a 5-year-old?
 
-    ![A Lightsaber](starwars.jpg)
   a:
-    show subpart weights: false
+    show subpart weights: true
     instructions: |
-      Some instructions for this part.
+      How much do you know about colours?
     i:
       instructions: |
-        Some instructions for this section.
-      maximum mark: 10
+        Which of the following is a colour?
+      maximum mark: 25
       tasks:
       - instructions: |
-          Some instructions for this task.
-        type: code
-      - instructions: |
-          Some instructions for this task.
-        type: essay
-        lines: 4
+          Select all that apply.
+        type: multiple choice select several
+        choices:
+          - a: "Pintos"
+          - b: "Brown"
+          - c: "Wacc"
+          - d: "DRP"
+          - e: "Magenta"
     ii:
       instructions: |
-        Some instructions for this section.
-      maximum mark: 10
+        Name 3 colours of the rainbow.
+      maximum mark: 25
       tasks:
       - instructions: |
-          Some instructions for this task.
-        type: code
-        lines: 4
+          Colour 1
+        type: essay
+        lines: 1
       - instructions: |
-          Some instructions for this task.
-        type: multiple choice select one
-        choices:
-          - a: "Text for option 1"
-          - b: "Text for option 2"
-          - c: "Text for option 3"
-          - d: "Text for option 4"
-        answer:
-          a: 2
-          c: 1.5
-          d: -1
+          Colour 2
+        type: essay
+        lines: 1
+      - instructions: |
+          Colour 3
+        type: essay
+        lines: 1
   b:
     show subpart weights: true
     instructions: |
-      Some instructions for this part.
+      Geography knowledge.
     i:
       instructions: |
-        Some instructions for this section.
-      maximum mark: 10
+        Which of the following is a city in America?
+      maximum mark: 50
       tasks:
       - instructions: |
-          Some instructions for this task.
-        type: multiple choice select several
+          Select one
+        type: multiple choice select one
         choices:
-          - a: "Text for option 1"
-          - b: "Text for option 2"
-          - c: "Text for option 3"
-          - d: "Text for option 4"
-        answer:
-          a: 2
-          b: 1.5
-          c: -1
-      - instructions: |
-          Some instructions for this task.
-        type: integer
-      - instructions: |
-          Some instructions for this task.
-        type: flag
+          - a: "Venice"
+          - b: "Slough"
+          - c: "New York"
+          - d: "Old York"
 2:
-  title: Title of the question
-  show part weights: false
+  title: Maths.
+  show part weights: true
   instructions: |
     Some instructions for this question.
   a:
-    show subpart weights: false
+    show subpart weights: true
     instructions: |
-      Some instructions for this part.
+      For the following, take the density to be 1024 kg/m3, the velocity to be 30 m/s, the diameter of the pipe to be 0.3m, and the viscosity to be 0.00149.
     i:
       instructions: |
-        Some instructions for this section.
-      maximum mark: 10
+        Calculate the Reynolds Number and justify what type of flow it is.
+      maximum mark: 50
       tasks:
       - instructions: |
-          Some instructions for this task.
+          Enter the Re value.
         type: essay
-        lines: 4
+        lines: 1
+      - instructions: |
+          Explain what type of flow.
+        type : essay
+        lines: 2
+    ii:
+      instructions: |
+        Write some Python code to calculate a Re value.
+      maximum mark: 50
+      tasks:
+      - instructions:
+          Enter the code.
+        type: code
+      
