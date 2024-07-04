@@ -1,5 +1,4 @@
-from typing import Callable
-
+from automarker_types import Automarker
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.pydantic_v1 import BaseModel, Field
 from langchain_openai import ChatOpenAI
@@ -28,9 +27,7 @@ prompt_template = ChatPromptTemplate.from_messages(
 )
 
 
-def make_value_explanation_automarker(
-    question: str, model_ans: float
-) -> Callable[[dict], tuple[int, str] | None]:
+def make_value_explanation_automarker(question: str, model_ans: float) -> Automarker:
     def value_explanation_automarker(tasks) -> tuple[int, str] | None:
         if not tasks:
             return None
@@ -66,10 +63,8 @@ def make_value_explanation_automarker(
     return value_explanation_automarker
 
 
-def make_prompt_automarker(
-    question: str, max_mark: int
-) -> Callable[[dict], tuple[int, str] | None]:
-    def prompt_automarker(tasks) -> tuple[int, str] | None:
+def make_prompt_automarker(question: str) -> Automarker:
+    def prompt_automarker(tasks, max_mark: int) -> tuple[int, str] | None:
         if not tasks:
             return None
         prompt = prompt_template.invoke(

@@ -1,6 +1,5 @@
-from typing import Callable
-
 import requests
+from automarker_types import Automarker
 
 
 def mark_students(
@@ -8,14 +7,15 @@ def mark_students(
     part_no: int,
     section_no: int,
     exam_id: str,
-    automarker: Callable[[dict], tuple[int, str] | None],
+    automarker: Automarker,
+    max_mark: int,
 ):
     students = get_students()
 
     for student in students:
         tasks = get_student_answer(student, question_no, part_no, section_no, exam_id)
 
-        mark_res = automarker(tasks)
+        mark_res = automarker(tasks, max_mark)
 
         if mark_res is not None:
             (mark, feedback) = mark_res
@@ -38,6 +38,7 @@ def post_feedback(student, mark, feedback, question_no, part_no, section_no):
             "section": section_no,
             "mark": mark,
             "feedback": feedback,
+            "marker": "Automark",
         },
     )
 
