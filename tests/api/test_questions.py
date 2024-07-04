@@ -59,3 +59,25 @@ def test_gets_empty_list_response_if_no_answers_exist_for_assessment(client):
     res = client("y2023_12345_exam").get("/questions/1/answer")
     assert res.status_code == 200
     assert len(res.json()) == 0
+
+
+def test_can_upload_answers(client):
+    res = client("y2023_12345_exam").post(
+        "/questions/1/answer",
+        json=[
+            {
+                "question": 1,
+                "part": 1,
+                "section": 1,
+                "task": 1,
+                "answer": "This is an answer",
+            }
+        ],
+    )
+
+    # Check DB
+    res_ans = client("y2023_12345_exam").get("/questions/1/answer")
+    assert res_ans.status_code == 200
+    [answer_] = res_ans.json()
+    assert res_ans.status_code == 200
+    assert answer_["answer"] == "This is an answer"
