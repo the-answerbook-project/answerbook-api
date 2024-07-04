@@ -65,3 +65,42 @@ def test_can_upload_answers(client):
     [answer_] = res_ans.json()
     assert res_ans.status_code == 200
     assert answer_["answer"] == "This is an answer"
+
+
+def test_can_upload_answers_for_multiple_users(client):
+    res = client("y2023_12345_exam").post(
+        "/answers/hgranger/question/1",
+        json=[
+            {
+                "question": 1,
+                "part": 1,
+                "section": 1,
+                "task": 1,
+                "answer": "This is an answer by hgranger",
+            }
+        ],
+    )
+
+    assert res.status_code == 200
+
+    res2 = client("y2023_12345_exam").post(
+        "/answers/hpotter/question/1",
+        json=[
+            {
+                "question": 1,
+                "part": 1,
+                "section": 1,
+                "task": 1,
+                "answer": "This is an answer by hpotter",
+            }
+        ],
+    )
+
+    assert res2.status_code == 200
+
+    # Check DB
+    res_ans = client("y2023_12345_exam").get("/answers/hgranger/question/1")
+    assert res_ans.status_code == 200
+    [answer_] = res_ans.json()
+    assert res_ans.status_code == 200
+    assert answer_["answer"] == "This is an answer by hgranger"

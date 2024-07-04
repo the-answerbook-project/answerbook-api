@@ -47,6 +47,7 @@ Retrieve the latest user answer to the given question's tasks.
 )
 def get_answer_to_question(
     question_number: int,
+    username: str,
     session: Session = Depends(get_session),
     assessment_id: str = Depends(get_assessment_id),
 ):
@@ -55,7 +56,7 @@ def get_answer_to_question(
         .where(
             Answer.question == question_number,
             Answer.exam_id == assessment_id,
-            Answer.username == "hpotter",
+            Answer.username == username,
         )
         .order_by(Answer.part, Answer.section, Answer.task)  # type: ignore
     )
@@ -72,12 +73,13 @@ Submit the user answer to the given question's task.
 )
 def submit_answer_to_question(
     question_number: int,
+    username: str,
     answers: list[AnswerRead],
     session: Session = Depends(get_session),
     assessment_id: str = Depends(get_assessment_id),
 ):
     answer_objects: list[Answer] = [
-        Answer(**answer.dict(), exam_id=assessment_id, username="hpotter")
+        Answer(**answer.dict(), exam_id=assessment_id, username=username)
         for answer in answers
     ]
 
@@ -87,7 +89,7 @@ def submit_answer_to_question(
         # Otherwise, insert
         query = select(Answer).where(
             Answer.exam_id == assessment_id,
-            Answer.username == "hpotter",
+            Answer.username == username,
             Answer.question == question_number,
             Answer.part == answer.part,
             Answer.section == answer.section,
