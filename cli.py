@@ -153,7 +153,7 @@ def populate_db(
 @cli.command(name="populate_demo")
 def populate_demo_data():
     """
-    Populates the database with dummy data.
+    Populates the database with demo data.
     """
 
     with dynamic_session():
