@@ -5,11 +5,11 @@ from langchain_openai import ChatOpenAI
 
 
 class MarkFeedback(BaseModel):
-    mark: int = Field(description="A mark out of 10")
+    mark: int = Field(description="The student's mark")
     feedback: str = Field(description="Feedback based on student's answer")
 
 
-model = ChatOpenAI(model="gpt-4")
+model = ChatOpenAI(model="gpt-4o", temperature=0)
 structured_model = model.with_structured_output(MarkFeedback)
 
 prompt_template = ChatPromptTemplate.from_messages(
@@ -28,28 +28,31 @@ prompt_template = ChatPromptTemplate.from_messages(
 
 
 def make_value_explanation_automarker(question: str, model_ans: float) -> Automarker:
-    def value_explanation_automarker(tasks) -> tuple[int, str] | None:
+    def value_explanation_automarker(tasks, max_mark) -> tuple[int, str] | None:
         if not tasks:
             return None
 
         mark = 0
         feedback = ""
 
-        student_ans = float(tasks[0]["answer"])
-        epsilon = 1
+        try:
+            student_ans = float(tasks[0]["answer"])
+            epsilon = 1
 
-        if abs(model_ans - student_ans) < epsilon:
-            mark += 2
-            feedback += "You calculated the value correctly. "
-        else:
-            feedback += "Your calculated value is incorrect. "
+            if abs(model_ans - student_ans) < epsilon:
+                mark += 2
+                feedback += "You calculated the value correctly. "
+            else:
+                feedback += "Your calculated value is incorrect. "
+        except ValueError:
+            feedback += "Your calculated value is not a number. "
 
         if len(tasks) < 2:
             feedback += "You failed to enter an explanation. "
         else:
             prompt = prompt_template.invoke(
                 {
-                    "max_mark": 8,
+                    "max_mark": max_mark - 2,
                     "question": question,
                     "answer": f"My value is: ${tasks[0]["answer"]}. My explanation is: ${tasks[1]["answer"]}",
                 }

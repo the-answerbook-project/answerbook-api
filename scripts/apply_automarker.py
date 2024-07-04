@@ -27,7 +27,7 @@ def mark_students(
 
                 if test_mode:
                     print()
-                    print("Student answer:")
+                    print(f"Student answer for {student['username']}:")
                     print(
                         "<No attempt>"
                         if not tasks

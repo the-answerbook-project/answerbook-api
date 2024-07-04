@@ -68,10 +68,10 @@ def automark(
             case "mcq":
                 choices = typer.prompt("Enter the correct choices (e.g. a,d,b)")
                 automarkers.append(make_mcq_automarker(choices.split(",")))
-            case "description":
+            case "prompt":
                 prompt = typer.prompt("Enter the prompt")
                 automarkers.append(make_prompt_automarker(prompt))
-            case "val-explain":
+            case "value_explanation":
                 prompt = typer.prompt("Enter the prompt")
                 # prompt = "Describe what type of flow given your Re value"
                 model_ans = float(typer.prompt("Enter the model answer"))
