@@ -1,3 +1,5 @@
+from typing import List
+
 import requests
 from automarker_types import Automarker
 
@@ -7,7 +9,7 @@ def mark_students(
     part_no: int,
     section_no: int,
     exam_id: str,
-    automarker: Automarker,
+    automarkers: List[Automarker],
     max_mark: int,
 ):
     students = get_students()
@@ -15,14 +17,16 @@ def mark_students(
     for student in students:
         tasks = get_student_answer(student, question_no, part_no, section_no, exam_id)
 
-        mark_res = automarker(tasks, max_mark)
+        for automarker in automarkers:
+            mark_res = automarker(tasks, max_mark)
 
-        if mark_res is not None:
-            (mark, feedback) = mark_res
-            post_feedback(student, mark, feedback, question_no, part_no, section_no)
+            if mark_res is not None:
+                (mark, feedback) = mark_res
+                post_feedback(student, mark, feedback, question_no, part_no, section_no)
+                break
 
 
-def get_student_answer(student, question_no, part_no, section_no, exam_id):
+def get_student_answer(student, question_no, part_no, section_no, _exam_id):
     res = requests.get(
         f"http://localhost:5004/answers/{student['username']}/question/{question_no}/part/{part_no}/section/{section_no}"
     )
