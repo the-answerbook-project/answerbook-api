@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 import click
 import typer
@@ -46,7 +46,9 @@ def automark(
     section: int = Option(help="Section number."),
     max_mark: int = Option(help="Maximum marks allocated to the question section."),
     test_mode: bool = Option(default=True, help="Test mode."),
-    limit: int = Option(default=-1, help="Limit for number of students to automark."),
+    limit: Optional[int] = Option(
+        default=None, help="Limit for number of students to automark."
+    ),
     exam_id: str = Option(default="y2023_12345_exam", help="Question number."),
 ):
     automarkers: List[Automarker] = [blank_automarker]

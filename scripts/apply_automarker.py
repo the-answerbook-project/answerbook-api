@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 import requests
 from automarker_types import Automarker
@@ -12,7 +12,7 @@ def mark_students(
     automarkers: List[Automarker],
     max_mark: int,
     test_mode: bool,
-    limit: int,
+    limit: Optional[int],
 ):
     students = get_students(limit)
 
@@ -68,6 +68,6 @@ def post_feedback(student, mark, feedback, question_no, part_no, section_no):
     )
 
 
-def get_students(limit: int):
+def get_students(limit: Optional[int]):
     res = requests.get("http://localhost:5004/students")
-    return res.json()[:limit] if limit != -1 else res.json()
+    return res.json()[:limit] if limit is not None else res.json()
