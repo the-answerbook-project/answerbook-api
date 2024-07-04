@@ -11,8 +11,10 @@ def mark_students(
     exam_id: str,
     automarkers: List[Automarker],
     max_mark: int,
+    test_mode: bool,
+    limit: int,
 ):
-    students = get_students()
+    students = get_students(limit)
 
     for student in students:
         tasks = get_student_answer(student, question_no, part_no, section_no, exam_id)
@@ -22,7 +24,26 @@ def mark_students(
 
             if mark_res is not None:
                 (mark, feedback) = mark_res
-                post_feedback(student, mark, feedback, question_no, part_no, section_no)
+
+                if test_mode:
+                    print()
+                    print("Student answer:")
+                    print(
+                        "<No attempt>"
+                        if not tasks
+                        else "\n".join(
+                            [f"Task {task["task"]}: {task["answer"]}" for task in tasks]
+                        )
+                    )
+                    print()
+                    print(f"Mark: {mark} / {max_mark}")
+                    print(f"Feedback: {feedback}")
+                    print()
+                else:
+                    post_feedback(
+                        student, mark, feedback, question_no, part_no, section_no
+                    )
+
                 break
 
 
@@ -47,6 +68,6 @@ def post_feedback(student, mark, feedback, question_no, part_no, section_no):
     )
 
 
-def get_students():
+def get_students(limit: int):
     res = requests.get("http://localhost:5004/students")
-    return res.json()
+    return res.json()[:limit] if limit != -1 else res.json()
