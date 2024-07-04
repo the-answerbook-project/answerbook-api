@@ -4,6 +4,7 @@ def test_can_get_enrolled_students_for_exam(client, student_factory):
     assert res.status_code == 200
     assert len(res.json()) == 3
 
+
 def test_student_has_expected_fields(client, student_factory):
     student_ = student_factory(exam_id="simple")
     res = client("simple").get("/students")
