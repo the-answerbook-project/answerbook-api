@@ -163,7 +163,9 @@ def populate_demo_data():
         StudentFactory(username="kss22", exam_id="y2023_12345_exam")
         StudentFactory(username="bn322", exam_id="y2023_12345_exam")
         StudentFactory(username="ma4723", exam_id="y2023_12345_exam")
-        StudentFactory(username="ab1223", exam_id="y2023_12345_exam")
+        StudentFactory(username="jsbailey", exam_id="y2023_12345_exam")
+        StudentFactory(username="rbc", exam_id="y2023_12345_exam")
+        StudentFactory(username="ip914", exam_id="y2023_12345_exam")
 
     print("Demo data populated Database populated successfully.")
 
