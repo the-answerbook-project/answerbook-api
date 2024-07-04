@@ -106,4 +106,18 @@ rubric:
       - instructions:
           Enter the code.
         type: code
-      
+
+3:
+  title: Random.
+  show part weights: true
+  instructions: |
+    Answer these questions as honestly as possible or not at all
+  a:
+    show subpart weights: true
+    i:
+      maximum mark: 100
+      tasks:
+      - instructions: |
+          How are you feeling?
+        type: essay
+        lines: 1
