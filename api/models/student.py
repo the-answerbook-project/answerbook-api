@@ -4,7 +4,7 @@ from sqlmodel import Field, SQLModel
 class Student(SQLModel, table=True):
     id: int = Field(primary_key=True)
     exam_id: str = Field(default=None, index=True)
-    username: str = Field(nullable=False)
+    username: str = Field(nullable=False, unique=True)
     firstname: str = Field(nullable=False)
     lastname: str = Field(nullable=False)
     cid: str = Field(nullable=False)
