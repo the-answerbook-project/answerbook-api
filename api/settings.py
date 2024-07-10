@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-DEV_ASSESSMENTS_DIR = Path(__file__).parent.parent / "dev_data"
+DEV_ASSESSMENTS_DIR = Path(__file__).parent.parent / "yaml_examples"
 
 from pydantic_settings import BaseSettings
 
