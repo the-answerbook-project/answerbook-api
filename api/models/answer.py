@@ -10,7 +10,7 @@ from sqlmodel import Field, SQLModel
 class Answer(SQLModel, table=True):
     id: int | None = Field(primary_key=True, default=None)
     exam_id: str = Field(default=None, index=True)
-    username: str = Field(nullable=False)
+    username: str = Field(nullable=False, foreign_key="student.username")
     question: int = Field(default=None)
     part: int = Field(default=None)
     section: int = Field(default=None)
