@@ -6,6 +6,7 @@ from api.router.answers import answers_router
 from api.router.authentication import authentication_router
 from api.router.exam import exam_router
 from api.router.marking import marking_router
+from api.router.proxy import proxy
 from api.router.questions import questions_router
 from api.settings import Settings
 
@@ -21,6 +22,10 @@ tags_metadata = [
     {
         "name": "marking",
         "description": "Exam marks and answers",
+    },
+    {
+        "name": "proxy",
+        "description": "Proxy endpoints to third-party services",
     },
     {
         "name": "authentication",
@@ -57,5 +62,6 @@ def create_application() -> FastAPI:
     rest_api.include_router(marking_router)
     rest_api.include_router(answers_router)
     rest_api.include_router(authentication_router)
+    rest_api.include_router(proxy)
 
     return rest_api
