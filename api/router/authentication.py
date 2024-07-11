@@ -25,6 +25,10 @@ def login(
     session: Session = Depends(get_session),
     # assessment_id: str = Depends(get_assessment_id),
 ):
+    # get username and check to see if they're on the exam as a student or staff
+    # check auth type
+    # auth
+    # return success or failure
     return []
 
 
