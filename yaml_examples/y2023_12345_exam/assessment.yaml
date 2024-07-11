@@ -86,6 +86,9 @@ rubric:
       maximum mark: 50
       tasks:
       - instructions: |
+          Enter your working below.
+        type: raw handwriting
+      - instructions: |
           Enter the derivative.
         type: processed handwriting
 2:
