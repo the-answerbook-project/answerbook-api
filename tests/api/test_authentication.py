@@ -57,7 +57,7 @@ def test_login_fails_for_invalid_credentials(client, assessment_factory):
     assert res.json()["detail"] == "Invalid credentials."
 
 
-def test_authentication_with_valid_credentials_gives_tokens_in_cookies(
+def test_authentication_with_valid_credentials_returns_token(
     client, assessment_factory
 ):
     pwd = "password"
@@ -75,7 +75,6 @@ def test_authentication_with_valid_credentials_gives_tokens_in_cookies(
     )
 
     assert res.status_code == 200
-    assert len(res.cookies) == 1
-    assert "access_token_cookie" in res.cookies.keys()
-    assert res.json()["username"] == "hpotter"
-    assert res.json()["role"] == "CANDIDATE"
+    assert "access_token" in res.json()
+    assert len(res.json()["access_token"]) > 0
+    assert res.json()["token_type"] == "bearer"
