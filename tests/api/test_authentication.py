@@ -21,33 +21,24 @@ def test_cannot_login_to_assessment_if_not_candidate_or_marker(
     assert res.json()["detail"] == "Username not registered for assessment."
 
 
-#
-# def test_authentication_with_valid_credentials_gives_tokens_in_cookies(
-#     client,assessment_factory
-# ):
-#     assessment_factory(
-#         exam_code="y2023_12345_exam",
-#         with_students=[
-#             dict(
-#                 username="hpotter",
-#
-#             )
-#         ],
-#     )
-#     res = client("y2023_12345_exam").post(
-#         "/y2023_12345_exam/auth/login", json=dict(username="hpotter", password="password")
-#     )
-#
-#     assert res.status_code == 200
-#     assert len(res.cookies) == 2
-#     assert all(
-#         cookie in res.cookies.keys()
-#         for cookie in (
-#             "access_token_cookie",
-#             "csrf_access_token",
-#
-#         )
-#     )
-#     assert res.json()["username"] == "hpotter"
-#     assert res.json()["role"] == "candidate"
-#
+def test_authentication_with_valid_credentials_gives_tokens_in_cookies(
+    client, assessment_factory
+):
+    assessment_factory(
+        exam_code="y2023_12345_exam",
+        with_students=[
+            dict(
+                username="hpotter",
+            )
+        ],
+    )
+    res = client("y2023_12345_exam").post(
+        "/y2023_12345_exam/auth/login",
+        json=dict(username="hpotter", password="password"),
+    )
+
+    assert res.status_code == 200
+    assert len(res.cookies) == 1
+    assert "access_token_cookie" in res.cookies.keys()
+    assert res.json()["username"] == "hpotter"
+    assert res.json()["role"] == "CANDIDATE"

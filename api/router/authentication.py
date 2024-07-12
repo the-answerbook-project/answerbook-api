@@ -1,18 +1,27 @@
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi_jwt import JwtAccessBearerCookie
 from pydantic import BaseModel
 from sqlmodel import Session, select
 from starlette import status
+from starlette.responses import JSONResponse
 
-from api.dependencies import get_assessment_id, get_session
+from api.dependencies import get_session, get_settings
 from api.models.assessment import Assessment
-from api.models.student import Student
 
 authentication_router = APIRouter(prefix="/{exam_code}/auth", tags=["exam"])
+
+access_security = JwtAccessBearerCookie(secret_key=get_settings().secret_key)
 
 
 class Credentials(BaseModel):
     username: str
     password: str
+
+
+class JwtSubject(BaseModel):
+    username: str
+    role: str
+    exam_code: str
 
 
 @authentication_router.post(
@@ -27,8 +36,6 @@ def login(
     exam_code: str,
     session: Session = Depends(get_session),
 ):
-    # get username and check to see if they're on the exam as a student or staff
-
     query = select(Assessment).where(Assessment.exam_code == exam_code)
     assessment = session.exec(query).first()
 
@@ -45,7 +52,8 @@ def login(
             detail="Username not registered for assessment.",
         )
 
-    # check auth type
-    # auth
-    # return success or failure
-    return []
+    response = JSONResponse(content={"username": credentials.username, "role": role})
+    subject = dict(username=credentials.username, role=role, exam_code=exam_code)
+    access_token = access_security.create_access_token(subject=subject)
+    access_security.set_access_cookie(response, access_token=access_token)
+    return response
