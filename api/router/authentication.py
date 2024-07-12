@@ -12,7 +12,7 @@ from api.dependencies import get_session, get_settings
 from api.models.assessment import Assessment
 from api.models.internal_credentials import InternalCredentials
 
-authentication_router = APIRouter(prefix="/{exam_code}/auth", tags=["exam"])
+authentication_router = APIRouter(prefix="/{exam_code}/auth", tags=["authentication"])
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -74,9 +74,12 @@ def create_access_token(subject: dict, expires_delta: timedelta):
 
 @authentication_router.post(
     "/login",
-    summary="Authentication",
+    summary="Assessment authentication",
     description="""
-Login to an assessment
+Log in to the assessment. The provided credentials are checked against the configured authentication method.
+Possible authentication methods are
+- **INTERNAL** to verify the provided creds against those generated and stored per exam
+- **LDAP** to verify the provided creds against those available in the indicated LDAP server
 """,
 )
 def login(

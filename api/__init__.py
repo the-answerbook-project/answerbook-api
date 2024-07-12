@@ -22,6 +22,10 @@ tags_metadata = [
         "name": "marking",
         "description": "Exam marks and answers",
     },
+    {
+        "name": "authentication",
+        "description": "Authentication tokens issuing and revoking",
+    },
 ]
 
 
