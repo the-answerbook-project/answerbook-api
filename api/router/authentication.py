@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 
 import jwt
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 from pydantic import BaseModel
@@ -11,12 +11,14 @@ from starlette import status
 from api.dependencies import get_session, get_settings
 from api.models.assessment import Assessment
 from api.models.internal_credentials import InternalCredentials
+from api.models.revoked_token import RevokedToken
 
 authentication_router = APIRouter(prefix="/{exam_code}/auth", tags=["authentication"])
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+JWT_ALGO = "HS256"
 FOUR_HOURS = 60 * 4
 
 
@@ -68,7 +70,7 @@ class Token(BaseModel):
 def create_access_token(subject: dict, expires_delta: timedelta):
     expire = datetime.now(timezone.utc) + expires_delta
     to_encode = {"sub": subject.copy(), "exp": expire}
-    encoded_jwt = jwt.encode(to_encode, get_settings().secret_key, algorithm="HS256")
+    encoded_jwt = jwt.encode(to_encode, get_settings().secret_key, algorithm=JWT_ALGO)
     return encoded_jwt
 
 
@@ -110,3 +112,20 @@ def login(
         subject=subject, expires_delta=access_token_expires
     )
     return Token(access_token=access_token, token_type="bearer")
+
+
+@authentication_router.delete("/logout")
+async def logout(
+    exam_code: str,
+    token: str = Depends(oauth2_scheme),
+    session: Session = Depends(get_session),
+):
+    try:
+        payload = jwt.decode(token, get_settings().secret_key, algorithms=[JWT_ALGO])
+        expiration = datetime.fromtimestamp(payload["exp"], tz=timezone.utc)
+    except jwt.ExpiredSignatureError:
+        expiration = datetime.now(timezone.utc)
+    revoked_token = RevokedToken(token=token, expiration=expiration)
+    session.add(revoked_token)
+    session.commit()
+    return Response(status_code=204)

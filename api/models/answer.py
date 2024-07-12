@@ -21,5 +21,4 @@ class Answer(SQLModel, table=True):
             sqlmodel.DateTime(timezone=False),
         )
     )
-
     ip: IPv4Address = Field(sa_column=Column(INET))

@@ -1,5 +1,11 @@
+from datetime import timedelta
+
+import jwt
+from sqlmodel import select
+
 from api.models.assessment import AuthenticationMode
-from api.router.authentication import pwd_context
+from api.models.revoked_token import RevokedToken
+from api.router.authentication import create_access_token, pwd_context
 
 
 def test_logging_in_to_non_existing_exam_gives_404(client):
@@ -78,3 +84,16 @@ def test_authentication_with_valid_credentials_returns_token(
     assert "access_token" in res.json()
     assert len(res.json()["access_token"]) > 0
     assert res.json()["token_type"] == "bearer"
+
+
+def test_logout_revokes_token(client, session, assessment_factory):
+    assessment = assessment_factory()
+    token = create_access_token(subject={}, expires_delta=timedelta(hours=1))
+    response = client(assessment.exam_code).delete(
+        f"/{assessment.exam_code}/auth/logout",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 204
+    query = select(RevokedToken).where(RevokedToken.token == token)
+    revoked_token = session.exec(query).first()
+    assert revoked_token is not None
