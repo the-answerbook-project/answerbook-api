@@ -3,20 +3,22 @@ from datetime import datetime, timedelta, timezone
 import jwt
 from fastapi import APIRouter, Depends, HTTPException, Response
 from fastapi.security import OAuth2PasswordBearer
-from passlib.context import CryptContext
 from pydantic import BaseModel
 from sqlmodel import Session, select
 from starlette import status
 
-from api.dependencies import get_session, get_settings
-from api.models.assessment import Assessment
-from api.models.internal_credentials import InternalCredentials
+from api.authentication.internal_authentication import (
+    get_user_credentials,
+    verify_password,
+)
+from api.authentication.ldap_authentication import LdapAuthenticator
+from api.dependencies import get_ldap_authenticator, get_session, get_settings
+from api.models.assessment import Assessment, AuthenticationMode
 from api.models.revoked_token import RevokedToken
 
 authentication_router = APIRouter(prefix="/{exam_code}/auth", tags=["authentication"])
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 JWT_ALGO = "HS256"
 FOUR_HOURS = 60 * 4
@@ -33,22 +35,21 @@ class JwtSubject(BaseModel):
     exam_code: str
 
 
-def get_user_credentials(session, exam_code: str, username: str):
-    query = (
-        select(InternalCredentials)
-        .join(Assessment)
-        .where(
-            InternalCredentials.username == username, Assessment.exam_code == exam_code
-        )
-    )
-    return session.exec(query).first()
+class Token(BaseModel):
+    access_token: str
+    token_type: str
 
 
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
+def create_access_token(subject: dict, expires_delta: timedelta):
+    expire = datetime.now(timezone.utc) + expires_delta
+    to_encode = {"sub": subject.copy(), "exp": expire}
+    encoded_jwt = jwt.encode(to_encode, get_settings().secret_key, algorithm=JWT_ALGO)
+    return encoded_jwt
 
 
-def internal_authentication(session, exam_code: str, username: str, password: str):
+def authenticate_via_internal_creds_match(
+    session, exam_code: str, username: str, password: str
+):
     user_credentials = get_user_credentials(session, exam_code, username)
     if not user_credentials:
         raise HTTPException(
@@ -62,16 +63,14 @@ def internal_authentication(session, exam_code: str, username: str, password: st
         )
 
 
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
-
-def create_access_token(subject: dict, expires_delta: timedelta):
-    expire = datetime.now(timezone.utc) + expires_delta
-    to_encode = {"sub": subject.copy(), "exp": expire}
-    encoded_jwt = jwt.encode(to_encode, get_settings().secret_key, algorithm=JWT_ALGO)
-    return encoded_jwt
+def authenticate_via_ldap(
+    ldap_authenticator: LdapAuthenticator, username: str, password: str
+):
+    if not ldap_authenticator.authenticate(username, password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials.",
+        )
 
 
 @authentication_router.post(
@@ -87,6 +86,7 @@ Possible authentication methods are
 def login(
     credentials: Credentials,
     exam_code: str,
+    ldap_authenticator: LdapAuthenticator = Depends(get_ldap_authenticator),
     session: Session = Depends(get_session),
 ) -> Token:
     query = select(Assessment).where(Assessment.exam_code == exam_code)
@@ -105,7 +105,13 @@ def login(
             detail="Username not registered for assessment.",
         )
     username, pwd = credentials.username, credentials.password
-    internal_authentication(session, exam_code, username, pwd)
+
+    match assessment.authentication_mode:
+        case AuthenticationMode.LDAP:
+            authenticate_via_ldap(ldap_authenticator, username, pwd)
+        case AuthenticationMode.INTERNAL:
+            authenticate_via_internal_creds_match(session, exam_code, username, pwd)
+
     subject = dict(username=username, role=role, exam_code=exam_code)
     access_token_expires = timedelta(minutes=FOUR_HOURS)
     access_token = create_access_token(

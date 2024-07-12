@@ -5,6 +5,7 @@ from fastapi import Depends
 from sqlalchemy.exc import SQLAlchemyError
 from sqlmodel import Session
 
+from api.authentication.ldap_authentication import LdapAuthenticator
 from api.database.connection import engine
 from api.schemas.exam import Assessment
 from api.settings import Settings
@@ -28,6 +29,14 @@ def get_settings() -> Settings:
 
 def get_assessment_id() -> str:
     return "y2023_12345_exam"
+
+
+@lru_cache()
+def get_ldap_authenticator() -> LdapAuthenticator:
+    settings = get_settings()
+    return LdapAuthenticator(
+        server_url=settings.ldap_server_url, base_dn=settings.ldap_base_dn
+    )
 
 
 def get_assessment(

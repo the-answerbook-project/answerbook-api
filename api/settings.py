@@ -18,3 +18,5 @@ class Settings(BaseSettings):
     assessments_dir: Path = _get_assessment_dir()
     testing: bool = bool(os.getenv("TESTING", 0))
     secret_key: str = os.getenv("SECRET_KEY", secrets.token_hex(32))
+    ldap_server_url: str = os.getenv("LDAP_SERVER_URL", "ldap.example.com")
+    ldap_base_dn: str = os.getenv("LDAP_BASE_DN", "ou=people,dc=example,dc=com")
