@@ -31,7 +31,6 @@ class Assessment(SQLModel, table=True):
     authentication_mode: AuthenticationMode = Field(
         sa_column=Column(
             Enum(AuthenticationMode, name="authentication_mode"),
-            server_default=AuthenticationMode.LDAP.value,
             nullable=False,
         )
     )
