@@ -1,7 +1,8 @@
 from enum import StrEnum, auto
 from operator import attrgetter
 
-from sqlmodel import Field, Relationship, SQLModel
+from sqlalchemy import Column
+from sqlmodel import Enum, Field, Relationship, SQLModel
 
 from api.models.student import Student
 
@@ -27,7 +28,13 @@ class UserRole(StrEnum):
 class Assessment(SQLModel, table=True):
     id: int = Field(primary_key=True)
     exam_code: str = Field(default=None, index=True)
-    authentication_mode: AuthenticationMode = Field(nullable=False)
+    authentication_mode: AuthenticationMode = Field(
+        sa_column=Column(
+            Enum(AuthenticationMode, name="authentication_mode"),
+            server_default=AuthenticationMode.LDAP.value,
+            nullable=False,
+        )
+    )
 
     candidates: list[Student] = Relationship(
         sa_relationship_kwargs={"cascade": "all,delete,delete-orphan"},
