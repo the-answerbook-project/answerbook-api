@@ -7,6 +7,19 @@ from factory.alchemy import SQLAlchemyModelFactory
 from api.dependencies import get_session
 from api.factories.student import StudentFactory
 from api.models.assessment import Assessment, AuthenticationMode
+from api.models.internal_credentials import InternalCredentials
+
+
+class InternalCredentialsFactory(SQLAlchemyModelFactory):
+    class Meta:
+        model = InternalCredentials
+        sqlalchemy_session = get_session()
+        sqlalchemy_session_persistence = "commit"
+
+    username: str = Faker(
+        "pystr_format", string_format="????##", letters=string.ascii_lowercase
+    )
+    hashed_password: str = Faker("pystr_format")
 
 
 class AssessmentFactory(SQLAlchemyModelFactory):
@@ -32,3 +45,12 @@ class AssessmentFactory(SQLAlchemyModelFactory):
             if isinstance(students, list):
                 for s in students:
                     StudentFactory(assessment_id=self.id, exam_id=self.exam_code, **s)
+
+    @factory.post_generation
+    def with_credentials(
+        self: Assessment, create: bool, credentials: list[dict], **kwargs
+    ) -> None:
+        if create and credentials:
+            if isinstance(credentials, list):
+                for c in credentials:
+                    InternalCredentialsFactory(assessment_id=self.id, **c)
