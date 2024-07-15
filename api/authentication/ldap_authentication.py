@@ -1,7 +1,5 @@
 import ldap
 
-# Used to parse key-value LDAP attributes
-USERNAME_FILTER_TEMPLATE = "(&(objectClass=user)(sAMAccountName=%s))"
 BINDING_TEMPLATE = "%s@IC.AC.UK"
 
 
