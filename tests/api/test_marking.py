@@ -9,7 +9,7 @@ valid_section = {"question": 1, "part": 1, "section": 1}
 
 def test_can_get_student_marks_for_question(client, assessment_factory):
     assessment_factory(
-        exam_code="y2023_12345_exam",
+        code="y2023_12345_exam",
         with_students=[
             dict(
                 username="hpotter",
@@ -25,7 +25,7 @@ def test_can_get_student_marks_for_question(client, assessment_factory):
 
 def test_response_mark_has_expected_fields(client, assessment_factory):
     assessment = assessment_factory(
-        exam_code="y2023_12345_exam",
+        code="y2023_12345_exam",
         with_students=[
             dict(
                 username="hpotter",
@@ -55,7 +55,7 @@ def test_gets_empty_list_response_if_no_marks_exist_for_assessment(client):
 
 def test_student_marks_include_mark_history(client, assessment_factory):
     assessment_factory(
-        exam_code="y2023_12345_exam",
+        code="y2023_12345_exam",
         with_students=[
             dict(
                 username="hpotter",
@@ -73,7 +73,7 @@ def test_student_marks_include_mark_history(client, assessment_factory):
 
 def test_mark_history_has_expected_fields(client, assessment_factory):
     assessment = assessment_factory(
-        exam_code="y2023_12345_exam",
+        code="y2023_12345_exam",
         with_students=[
             dict(
                 username="hpotter",
@@ -109,7 +109,7 @@ def test_cannot_post_to_marks_with_no_mark_and_no_feedback(client):
 
 def test_posting_mark_without_feedback_updates_root_mark(client, assessment_factory):
     assessment = assessment_factory(
-        exam_code="y2023_12345_exam",
+        code="y2023_12345_exam",
         with_students=[
             dict(
                 username="hpotter",
@@ -137,7 +137,7 @@ def test_posting_feedback_without_mark_updates_root_feedback(
     client, assessment_factory
 ):
     assessment = assessment_factory(
-        exam_code="y2023_12345_exam",
+        code="y2023_12345_exam",
         with_students=[
             dict(
                 username="hpotter",
@@ -164,7 +164,7 @@ def test_posting_feedback_without_mark_updates_root_feedback(
 
 def test_posting_mark_and_feedback_for_section(client, assessment_factory):
     assessment_factory(
-        exam_code="y2023_12345_exam",
+        code="y2023_12345_exam",
         with_students=[dict(username="hpotter")],
     )
     res = client("y2023_12345_exam").post(
@@ -181,7 +181,7 @@ def test_posting_mark_and_feedback_for_section(client, assessment_factory):
 
 def test_posting_mark_without_feedback_adds_to_mark_history(client, assessment_factory):
     assessment = assessment_factory(
-        exam_code="y2023_12345_exam",
+        code="y2023_12345_exam",
         with_students=[
             dict(
                 username="hpotter",
@@ -208,7 +208,7 @@ def test_posting_mark_without_feedback_adds_to_mark_history(client, assessment_f
 
 def test_posting_feedback_without_mark_adds_to_mark_history(client, assessment_factory):
     assessment = assessment_factory(
-        exam_code="y2023_12345_exam",
+        code="y2023_12345_exam",
         with_students=[
             dict(
                 username="hpotter",
@@ -239,7 +239,7 @@ def test_posting_feedback_without_mark_adds_to_mark_history(client, assessment_f
 
 def test_can_get_all_student_answers_for_exam(client, assessment_factory):
     assessment_factory(
-        exam_code="y2023_12345_exam",
+        code="y2023_12345_exam",
         with_students=[
             dict(
                 username="hpotter",
@@ -260,7 +260,7 @@ def test_gets_empty_list_response_if_no_answers_exist_for_assessment(client):
 
 def test_response_answer_has_expected_fields(client, assessment_factory):
     assessment = assessment_factory(
-        exam_code="y2023_12345_exam",
+        code="y2023_12345_exam",
         with_students=[
             dict(
                 username="hpotter",

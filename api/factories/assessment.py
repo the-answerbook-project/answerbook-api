@@ -28,7 +28,7 @@ class AssessmentFactory(SQLAlchemyModelFactory):
         sqlalchemy_session = get_session()
         sqlalchemy_session_persistence = "commit"
 
-    exam_code: str = Faker("pystr_format", string_format="y####_#####_exam")
+    code: str = Faker("pystr_format", string_format="y####_#####_exam")
     authentication_mode: AuthenticationMode = AuthenticationMode.INTERNAL
 
     @factory.post_generation
@@ -40,11 +40,11 @@ class AssessmentFactory(SQLAlchemyModelFactory):
                 for _ in range(students):
                     StudentFactory(
                         assessment_id=self.id,
-                        exam_id=self.exam_code,
+                        exam_id=self.code,
                     )
             if isinstance(students, list):
                 for s in students:
-                    StudentFactory(assessment_id=self.id, exam_id=self.exam_code, **s)
+                    StudentFactory(assessment_id=self.id, exam_id=self.code, **s)
 
     @factory.post_generation
     def with_credentials(

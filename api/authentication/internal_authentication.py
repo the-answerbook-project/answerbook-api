@@ -7,12 +7,12 @@ from api.models.internal_credentials import InternalCredentials
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-def get_user_credentials(session, exam_code: str, username: str):
+def get_user_credentials(session, assessment_code: str, username: str):
     query = (
         select(InternalCredentials)
         .join(Assessment)
         .where(
-            InternalCredentials.username == username, Assessment.exam_code == exam_code
+            InternalCredentials.username == username, Assessment.code == assessment_code
         )
     )
     return session.exec(query).first()

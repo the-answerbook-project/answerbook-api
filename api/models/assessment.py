@@ -27,7 +27,7 @@ class UserRole(StrEnum):
 
 class Assessment(SQLModel, table=True):
     id: int = Field(primary_key=True)
-    exam_code: str = Field(default=None, index=True)
+    code: str = Field(default=None, index=True)
     authentication_mode: AuthenticationMode = Field(
         sa_column=Column(
             Enum(AuthenticationMode, name="authentication_mode"),

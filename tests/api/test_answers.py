@@ -4,7 +4,7 @@ PREFIX = f"/answers/{username}"
 
 def test_can_get_a_part_for_student(client, assessment_factory):
     assessment_factory(
-        exam_code="y2023_12345_exam",
+        code="y2023_12345_exam",
         with_students=[
             dict(
                 username="hpotter",
@@ -19,7 +19,7 @@ def test_can_get_a_part_for_student(client, assessment_factory):
 
 def test_can_get_user_answers_for_question(client, assessment_factory):
     assessment_factory(
-        exam_code="y2023_12345_exam",
+        code="y2023_12345_exam",
         with_students=[
             dict(
                 username="hpotter",
@@ -35,7 +35,7 @@ def test_can_get_user_answers_for_question(client, assessment_factory):
 
 def test_response_answer_has_expected_fields(client, assessment_factory):
     assessment = assessment_factory(
-        exam_code="y2023_12345_exam",
+        code="y2023_12345_exam",
         with_students=[
             dict(
                 username="hpotter",
@@ -64,7 +64,7 @@ def test_gets_empty_list_response_if_no_answers_exist_for_assessment(client):
 
 def test_can_upload_answers(client, assessment_factory):
     assessment_factory(
-        exam_code="y2023_12345_exam",
+        code="y2023_12345_exam",
         with_students=[
             dict(
                 username="hpotter",
@@ -94,7 +94,7 @@ def test_can_upload_answers(client, assessment_factory):
 
 def test_can_upload_answers_for_multiple_users(client, assessment_factory):
     assessment_factory(
-        exam_code="y2023_12345_exam",
+        code="y2023_12345_exam",
         with_students=[
             dict(username="hpotter"),
             dict(username="hgranger"),

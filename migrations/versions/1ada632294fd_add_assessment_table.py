@@ -23,7 +23,7 @@ def upgrade() -> None:
     op.create_table(
         "assessment",
         sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("exam_code", sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+        sa.Column("code", sqlmodel.sql.sqltypes.AutoString(), nullable=False),
         sa.Column(
             "authentication_mode",
             sa.Enum("LDAP", "INTERNAL", name="authentication_mode"),
@@ -31,12 +31,10 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index(
-        op.f("ix_assessment_exam_code"), "assessment", ["exam_code"], unique=False
-    )
+    op.create_index(op.f("ix_assessment_code"), "assessment", ["code"], unique=False)
 
 
 def downgrade() -> None:
-    op.drop_index(op.f("ix_assessment_exam_code"), table_name="assessment")
+    op.drop_index(op.f("ix_assessment_code"), table_name="assessment")
     op.drop_table("assessment")
     op.execute("DROP TYPE authentication_mode")

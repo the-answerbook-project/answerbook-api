@@ -69,5 +69,5 @@ def get_assessment_spec(assessment_code: str) -> AssessmentSpec | None:
 def get_assessment_config(
     assessment_code: str, session: Session = Depends(get_session)
 ) -> Assessment | None:
-    query = select(Assessment).where(Assessment.exam_code == assessment_code)
+    query = select(Assessment).where(Assessment.code == assessment_code)
     return session.exec(query).first()
