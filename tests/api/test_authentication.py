@@ -12,9 +12,21 @@ from api.models.revoked_token import RevokedToken
 from api.router.authentication import create_access_token
 
 
-def test_logging_in_to_non_existing_exam_gives_404(client_):
+def test_logging_in_to_assessment_with_no_configuration_gives_404(client_):
     res = client_.post(
         "/not_exists/auth/login", json=dict(username="hpotter", password="password")
+    )
+    assert res.status_code == 404
+    assert res.json()["detail"] == "Assessment not found."
+
+
+def test_logging_in_to_assessment_with_no_specification_gives_404(
+    client_, assessment_factory
+):
+    assessment_factory(exam_code="y1234_4321_exam")
+    res = client_.post(
+        "/y1234_4321_exam/auth/login",
+        json=dict(username="hpotter", password="password"),
     )
     assert res.status_code == 404
     assert res.json()["detail"] == "Assessment not found."

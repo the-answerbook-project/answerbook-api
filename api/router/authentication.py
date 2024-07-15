@@ -12,11 +12,20 @@ from api.authentication.internal_authentication import (
     verify_password,
 )
 from api.authentication.ldap_authentication import LdapAuthenticator
-from api.dependencies import get_ldap_authenticator, get_session, get_settings
+from api.dependencies import (
+    get_assessment_config,
+    get_assessment_spec,
+    get_ldap_authenticator,
+    get_session,
+    get_settings,
+)
 from api.models.assessment import Assessment, AuthenticationMode
 from api.models.revoked_token import RevokedToken
+from api.schemas.exam import AssessmentSpec
 
-authentication_router = APIRouter(prefix="/{exam_code}/auth", tags=["authentication"])
+authentication_router = APIRouter(
+    prefix="/{assessment_code}/auth", tags=["authentication"]
+)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -32,7 +41,7 @@ class Credentials(BaseModel):
 class JwtSubject(BaseModel):
     username: str
     role: str
-    exam_code: str
+    assessment_code: str
 
 
 class Token(BaseModel):
@@ -48,9 +57,9 @@ def create_access_token(subject: dict, expires_delta: timedelta):
 
 
 def authenticate_via_internal_creds_match(
-    session, exam_code: str, username: str, password: str
+    session, assessment_code: str, username: str, password: str
 ):
-    user_credentials = get_user_credentials(session, exam_code, username)
+    user_credentials = get_user_credentials(session, assessment_code, username)
     if not user_credentials:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -73,6 +82,10 @@ def authenticate_via_ldap(
         )
 
 
+def calculate_token_expiration(assessment_spec: AssessmentSpec) -> timedelta:
+    return timedelta(minutes=FOUR_HOURS)
+
+
 @authentication_router.post(
     "/login",
     summary="Assessment authentication",
@@ -85,20 +98,19 @@ Possible authentication methods are
 )
 def login(
     credentials: Credentials,
-    exam_code: str,
+    assessment_code: str,
     ldap_authenticator: LdapAuthenticator = Depends(get_ldap_authenticator),
+    assessment_config: Assessment | None = Depends(get_assessment_config),
+    assessment_spec: AssessmentSpec | None = Depends(get_assessment_spec),
     session: Session = Depends(get_session),
 ) -> Token:
-    query = select(Assessment).where(Assessment.exam_code == exam_code)
-    assessment = session.exec(query).first()
-
-    if assessment is None:
+    if assessment_config is None or assessment_spec is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Assessment not found.",
         )
 
-    role = assessment.get_role(credentials.username)
+    role = assessment_config.get_role(credentials.username)
     if role is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -106,14 +118,16 @@ def login(
         )
     username, pwd = credentials.username, credentials.password
 
-    match assessment.authentication_mode:
+    match assessment_config.authentication_mode:
         case AuthenticationMode.LDAP:
             authenticate_via_ldap(ldap_authenticator, username, pwd)
         case AuthenticationMode.INTERNAL:
-            authenticate_via_internal_creds_match(session, exam_code, username, pwd)
+            authenticate_via_internal_creds_match(
+                session, assessment_code, username, pwd
+            )
 
-    subject = dict(username=username, role=role, exam_code=exam_code)
-    access_token_expires = timedelta(minutes=FOUR_HOURS)
+    subject = dict(username=username, role=role, assessment_code=assessment_code)
+    access_token_expires = calculate_token_expiration(assessment_spec)
     access_token = create_access_token(
         subject=subject, expires_delta=access_token_expires
     )
@@ -122,7 +136,7 @@ def login(
 
 @authentication_router.delete("/logout")
 async def logout(
-    exam_code: str,
+    assessment_code: str,
     token: str = Depends(oauth2_scheme),
     session: Session = Depends(get_session),
 ):

@@ -94,7 +94,7 @@ class Rubric(SQLModel):
     questions_to_answer: int
 
 
-class Assessment(SQLModel):
+class AssessmentSpec(SQLModel):
     course_code: str
     course_name: str
     alternative_codes: list[str]
