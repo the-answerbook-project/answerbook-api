@@ -80,3 +80,8 @@ def client_fixture(app):
         return TestClient(app)
 
     return client_for_assessment
+
+
+@pytest.fixture(name="client_")
+def client_fixture_(app):
+    return TestClient(app)

@@ -12,8 +12,8 @@ from api.models.revoked_token import RevokedToken
 from api.router.authentication import create_access_token
 
 
-def test_logging_in_to_non_existing_exam_gives_404(client):
-    res = client("not_exists").post(
+def test_logging_in_to_non_existing_exam_gives_404(client_):
+    res = client_.post(
         "/not_exists/auth/login", json=dict(username="hpotter", password="password")
     )
     assert res.status_code == 404
@@ -21,10 +21,10 @@ def test_logging_in_to_non_existing_exam_gives_404(client):
 
 
 def test_cannot_login_to_assessment_if_not_candidate_or_marker(
-    client, assessment_factory
+    client_, assessment_factory
 ):
     assessment_factory(exam_code="y2023_12345_exam")
-    res = client("y2023_12345_exam").post(
+    res = client_.post(
         "/y2023_12345_exam/auth/login",
         json=dict(username="hpotter", password="password"),
     )
@@ -33,14 +33,14 @@ def test_cannot_login_to_assessment_if_not_candidate_or_marker(
 
 
 def test_internal_authentication_login_fails_for_missing_credentials(
-    client, assessment_factory
+    client_, assessment_factory
 ):
     assessment_factory(
         exam_code="y2023_12345_exam",
         authentication_mode=AuthenticationMode.INTERNAL,
         with_students=[dict(username="hpotter")],
     )
-    res = client("y2023_12345_exam").post(
+    res = client_.post(
         "/y2023_12345_exam/auth/login",
         json=dict(username="hpotter", password="password"),
     )
@@ -50,7 +50,7 @@ def test_internal_authentication_login_fails_for_missing_credentials(
 
 
 def test_internal_authentication_login_fails_for_invalid_credentials(
-    client, assessment_factory
+    client_, assessment_factory
 ):
     assessment_factory(
         exam_code="y2023_12345_exam",
@@ -62,7 +62,7 @@ def test_internal_authentication_login_fails_for_invalid_credentials(
             )
         ],
     )
-    res = client("y2023_12345_exam").post(
+    res = client_.post(
         "/y2023_12345_exam/auth/login",
         json=dict(username="hpotter", password="password"),
     )
@@ -72,7 +72,7 @@ def test_internal_authentication_login_fails_for_invalid_credentials(
 
 
 def test_internal_authentication_login_with_valid_credentials_returns_token(
-    client, assessment_factory
+    client_, assessment_factory
 ):
     pwd = "password"
     assessment_factory(
@@ -83,7 +83,7 @@ def test_internal_authentication_login_with_valid_credentials_returns_token(
             dict(username="hpotter", hashed_password=pwd_context.hash(pwd))
         ],
     )
-    res = client("y2023_12345_exam").post(
+    res = client_.post(
         "/y2023_12345_exam/auth/login",
         json=dict(username="hpotter", password=pwd),
     )
@@ -119,10 +119,10 @@ def test_ldap_authentication_login_with_valid_credentials_returns_token(
     assert res.json()["token_type"] == "bearer"
 
 
-def test_logout_revokes_token(client, session, assessment_factory):
+def test_logout_revokes_token(client_, session, assessment_factory):
     assessment = assessment_factory()
     token = create_access_token(subject={}, expires_delta=timedelta(hours=1))
-    response = client(assessment.exam_code).delete(
+    response = client_.delete(
         f"/{assessment.exam_code}/auth/logout",
         headers={"Authorization": f"Bearer {token}"},
     )
