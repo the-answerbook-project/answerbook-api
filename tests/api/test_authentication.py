@@ -1,6 +1,7 @@
 from datetime import timedelta
 from unittest.mock import Mock
 
+import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import select
 
@@ -9,7 +10,7 @@ from api.authentication.ldap_authentication import LdapAuthenticator
 from api.dependencies import get_ldap_authenticator
 from api.models.assessment import AuthenticationMode
 from api.models.revoked_token import RevokedToken
-from api.router.authentication import create_access_token
+from api.router.authentication import calculate_token_expiration, create_access_token
 
 
 def test_logging_in_to_assessment_with_no_configuration_gives_404(client_):
@@ -142,3 +143,17 @@ def test_logout_revokes_token(client_, session, assessment_factory):
     query = select(RevokedToken).where(RevokedToken.token == token)
     revoked_token = session.exec(query).first()
     assert revoked_token is not None
+
+
+@pytest.mark.parametrize(
+    "duration, extensions, expected_minutes",
+    [
+        (120, {}, 240),
+        (120, {"hpotter": "32 minutes"}, 272),
+        (120, {"hpotter": "32 minutes", "rweasley": "40"}, 280),
+    ],
+)
+def test_calculation_of_token_expiration(duration, extensions, expected_minutes):
+    assert calculate_token_expiration(duration, extensions) == timedelta(
+        minutes=expected_minutes
+    )

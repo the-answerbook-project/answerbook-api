@@ -30,7 +30,7 @@ authentication_router = APIRouter(
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 JWT_ALGO = "HS256"
-FOUR_HOURS = 60 * 4
+TWO_HOURS_IN_MINUTES = 120
 
 
 class Credentials(BaseModel):
@@ -82,8 +82,15 @@ def authenticate_via_ldap(
         )
 
 
-def calculate_token_expiration(assessment_spec: AssessmentSpec) -> timedelta:
-    return timedelta(minutes=FOUR_HOURS)
+def calculate_token_expiration(
+    assessment_duration: int, extensions: dict[str, str]
+) -> timedelta:
+    max_extension = max(*extensions.values(), "0")
+    max_extension = max_extension.split(" ")[0].replace("minutes", "")
+    minutes = assessment_duration
+    minutes += int(max_extension)
+    minutes += TWO_HOURS_IN_MINUTES
+    return timedelta(minutes=minutes)
 
 
 @authentication_router.post(
@@ -100,17 +107,17 @@ def login(
     credentials: Credentials,
     assessment_code: str,
     ldap_authenticator: LdapAuthenticator = Depends(get_ldap_authenticator),
-    assessment_config: Assessment | None = Depends(get_assessment_config),
-    assessment_spec: AssessmentSpec | None = Depends(get_assessment_spec),
+    config: Assessment | None = Depends(get_assessment_config),
+    spec: AssessmentSpec | None = Depends(get_assessment_spec),
     session: Session = Depends(get_session),
 ) -> Token:
-    if assessment_config is None or assessment_spec is None:
+    if config is None or spec is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Assessment not found.",
         )
 
-    role = assessment_config.get_role(credentials.username)
+    role = config.get_role(credentials.username)
     if role is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -118,7 +125,7 @@ def login(
         )
     username, pwd = credentials.username, credentials.password
 
-    match assessment_config.authentication_mode:
+    match config.authentication_mode:
         case AuthenticationMode.LDAP:
             authenticate_via_ldap(ldap_authenticator, username, pwd)
         case AuthenticationMode.INTERNAL:
@@ -127,7 +134,7 @@ def login(
             )
 
     subject = dict(username=username, role=role, assessment_code=assessment_code)
-    access_token_expires = calculate_token_expiration(assessment_spec)
+    access_token_expires = calculate_token_expiration(spec.duration, spec.extensions)
     access_token = create_access_token(
         subject=subject, expires_delta=access_token_expires
     )
