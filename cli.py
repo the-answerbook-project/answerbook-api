@@ -3,10 +3,12 @@ from contextlib import contextmanager
 import typer
 from sqlalchemy import text
 from sqlmodel import SQLModel
-from typer import Argument
 
 from api.dependencies import get_session
-from api.factories import AnswerFactory, StudentFactory, all_factories
+from api.factories import (
+    AssessmentFactory,
+    all_factories,
+)
 
 cli = typer.Typer()
 
@@ -40,112 +42,35 @@ def erase_data():
 
 
 @cli.command(name="populate_db")
-def populate_db(
-    year: str = Argument(help="Academic year in short form e.g. 2324 for 2023-2024"),
-):
+def populate_db():
     """
     Populates the database with dummy data.
     """
     with dynamic_session():
-        StudentFactory(username="hgranger", exam_id="y2023_12345_exam")
-        StudentFactory(username="hpotter", exam_id="y2023_12345_exam")
-        AnswerFactory(
-            exam_id="y2023_12345_exam",
-            username="hpotter",
-            question=1,
-            part=1,
-            section=1,
-            task=1,
-        )
-        AnswerFactory(
-            exam_id="y2023_12345_exam",
-            username="hpotter",
-            question=1,
-            part=1,
-            section=1,
-            task=2,
-        )
-        AnswerFactory(
-            exam_id="y2023_12345_exam",
-            username="hpotter",
-            question=1,
-            part=1,
-            section=1,
-            task=3,
-        )
-        AnswerFactory(
-            exam_id="y2023_12345_exam",
-            username="hpotter",
-            question=2,
-            part=1,
-            section=1,
-            task=1,
-        )
-        AnswerFactory(
-            exam_id="y2023_12345_exam",
-            username="hpotter",
-            question=2,
-            part=1,
-            section=1,
-            task=1,
-        )
-        AnswerFactory(
-            exam_id="y2023_12345_exam",
-            username="hpotter",
-            question=3,
-            part=1,
-            section=1,
-            task=1,
-        )
-
-        StudentFactory(username="hgranger", exam_id="y2023_12345_exam")
-        AnswerFactory(
-            exam_id="y2023_12345_exam",
-            username="hgranger",
-            question=1,
-            part=1,
-            section=1,
-            task=1,
-        )
-        AnswerFactory(
-            exam_id="y2023_12345_exam",
-            username="hgranger",
-            question=1,
-            part=1,
-            section=1,
-            task=2,
-        )
-        AnswerFactory(
-            exam_id="y2023_12345_exam",
-            username="hgranger",
-            question=1,
-            part=1,
-            section=1,
-            task=3,
-        )
-        AnswerFactory(
-            exam_id="y2023_12345_exam",
-            username="hgranger",
-            question=2,
-            part=1,
-            section=1,
-            task=1,
-        )
-        AnswerFactory(
-            exam_id="y2023_12345_exam",
-            username="hgranger",
-            question=2,
-            part=1,
-            section=1,
-            task=1,
-        )
-        AnswerFactory(
-            exam_id="y2023_12345_exam",
-            username="hgranger",
-            question=3,
-            part=1,
-            section=1,
-            task=1,
+        AssessmentFactory(
+            code="y2023_12345_exam",
+            with_students=[
+                dict(
+                    username="hgranger",
+                    with_answers=[
+                        dict(question=1, part=1, section=1, task=1),
+                        dict(question=1, part=1, section=1, task=2),
+                        dict(question=1, part=1, section=1, task=3),
+                        dict(question=2, part=1, section=1, task=1),
+                        dict(question=3, part=1, section=1, task=1),
+                    ],
+                ),
+                dict(
+                    username="hpotter",
+                    with_answers=[
+                        dict(question=1, part=1, section=1, task=1),
+                        dict(question=1, part=1, section=1, task=2),
+                        dict(question=1, part=1, section=1, task=3),
+                        dict(question=2, part=1, section=1, task=1),
+                        dict(question=3, part=1, section=1, task=1),
+                    ],
+                ),
+            ],
         )
     print("Database populated successfully.")
 
@@ -157,16 +82,14 @@ def populate_demo_data():
     """
 
     with dynamic_session():
-        StudentFactory(username="hgranger", exam_id="y2023_12345_exam")
-        StudentFactory(username="hpotter", exam_id="y2023_12345_exam")
-        StudentFactory(username="rweasley", exam_id="y2023_12345_exam")
-        StudentFactory(username="kss22", exam_id="y2023_12345_exam")
-        StudentFactory(username="bn322", exam_id="y2023_12345_exam")
-        StudentFactory(username="ma4723", exam_id="y2023_12345_exam")
-        StudentFactory(username="jsbailey", exam_id="y2023_12345_exam")
-        StudentFactory(username="rbc", exam_id="y2023_12345_exam")
-        StudentFactory(username="ip914", exam_id="y2023_12345_exam")
-
+        AssessmentFactory(
+            code="y2023_12345_exam",
+            with_students=[
+                dict(username="hgranger"),
+                dict(username="hpotter"),
+                dict(username="rweasley"),
+            ],
+        )
     print("Demo data populated Database populated successfully.")
 
 
