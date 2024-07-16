@@ -24,6 +24,7 @@ class TaskType(StrEnum):
     CODE = auto()
     MULTIPLE_CHOICE_SELECT_ONE = auto()
     MULTIPLE_CHOICE_SELECT_SEVERAL = auto()
+    PROCESSED_HANDWRITING = auto()
 
 
 class MCQOption(SQLModel):

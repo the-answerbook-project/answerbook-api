@@ -76,6 +76,18 @@ rubric:
           - b: "Slough"
           - c: "New York"
           - d: "Old York"
+  c:
+    show subpart weights: true
+    instructions: |
+      Calculus questions
+    i:
+      instructions: |
+        Calculate the derivative of $x^2$.
+      maximum mark: 50
+      tasks:
+      - instructions: |
+          Enter the derivative.
+        type: processed handwriting
 2:
   title: Maths.
   show part weights: true
