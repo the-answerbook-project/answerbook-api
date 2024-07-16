@@ -5,6 +5,7 @@ from sqlmodel import Column, DateTime, Field, SQLModel
 
 
 class RevokedToken(SQLModel, table=True):
+    __tablename__ = "revoked_token"
     id: int = Field(default=None, primary_key=True)
     token: str
     timestamp: datetime = Field(
