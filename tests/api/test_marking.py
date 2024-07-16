@@ -7,11 +7,15 @@ mark_posting_ts = datetime(2024, 5, 1, 14, 22, tzinfo=timezone.utc)
 valid_section = {"question": 1, "part": 1, "section": 1}
 
 
-def test_can_get_student_marks_for_question(client, student_factory):
-    student_factory(
-        exam_id="y2023_12345_exam",
-        username="hpotter",
-        with_marks=[dict(question=1), dict(question=1), dict(question=1)],
+def test_can_get_student_marks_for_question(client, assessment_factory):
+    assessment_factory(
+        code="y2023_12345_exam",
+        with_students=[
+            dict(
+                username="hpotter",
+                with_marks=[dict(question=1), dict(question=1), dict(question=1)],
+            )
+        ],
     )
 
     res = client("y2023_12345_exam").get("/hpotter/marks")
@@ -19,12 +23,17 @@ def test_can_get_student_marks_for_question(client, student_factory):
     assert len(res.json()) == 3
 
 
-def test_response_mark_has_expected_fields(client, student_factory):
-    student = student_factory(
-        exam_id="y2023_12345_exam",
-        username="hpotter",
-        with_marks=1,
+def test_response_mark_has_expected_fields(client, assessment_factory):
+    assessment = assessment_factory(
+        code="y2023_12345_exam",
+        with_students=[
+            dict(
+                username="hpotter",
+                with_marks=1,
+            )
+        ],
     )
+    [student] = assessment.candidates
     [mark] = student.marks
 
     res = client("y2023_12345_exam").get("/hpotter/marks")
@@ -44,11 +53,15 @@ def test_gets_empty_list_response_if_no_marks_exist_for_assessment(client):
     assert len(res.json()) == 0
 
 
-def test_student_marks_include_mark_history(client, student_factory):
-    student_factory(
-        exam_id="y2023_12345_exam",
-        username="hpotter",
-        with_marks=[dict(question=1, with_history=5)],
+def test_student_marks_include_mark_history(client, assessment_factory):
+    assessment_factory(
+        code="y2023_12345_exam",
+        with_students=[
+            dict(
+                username="hpotter",
+                with_marks=[dict(question=1, with_history=5)],
+            )
+        ],
     )
 
     res = client("y2023_12345_exam").get("/hpotter/marks")
@@ -58,12 +71,17 @@ def test_student_marks_include_mark_history(client, student_factory):
     assert len(mark_["history"]) == 5
 
 
-def test_mark_history_has_expected_fields(client, student_factory):
-    student = student_factory(
-        exam_id="y2023_12345_exam",
-        username="hpotter",
-        with_marks=[dict(question=1, with_history=1)],
+def test_mark_history_has_expected_fields(client, assessment_factory):
+    assessment = assessment_factory(
+        code="y2023_12345_exam",
+        with_students=[
+            dict(
+                username="hpotter",
+                with_marks=[dict(question=1, with_history=1)],
+            )
+        ],
     )
+    [student] = assessment.candidates
     [mark] = student.marks
     [history] = mark.history
 
@@ -89,11 +107,17 @@ def test_cannot_post_to_marks_with_no_mark_and_no_feedback(client):
     )
 
 
-def test_posting_mark_without_feedback_updates_root_mark(client, student_factory):
-    student = student_factory(
-        exam_id="y2023_12345_exam",
-        with_marks=[dict(**valid_section, with_history=1)],
+def test_posting_mark_without_feedback_updates_root_mark(client, assessment_factory):
+    assessment = assessment_factory(
+        code="y2023_12345_exam",
+        with_students=[
+            dict(
+                username="hpotter",
+                with_marks=[dict(**valid_section, with_history=1)],
+            )
+        ],
     )
+    [student] = assessment.candidates
     [mark] = student.marks
 
     with freeze_time(mark_posting_ts):
@@ -109,11 +133,19 @@ def test_posting_mark_without_feedback_updates_root_mark(client, student_factory
     assert mark_["timestamp"] == "2024-05-01T14:22:00+00:00"
 
 
-def test_posting_feedback_without_mark_updates_root_feedback(client, student_factory):
-    student = student_factory(
-        exam_id="y2023_12345_exam",
-        with_marks=[dict(**valid_section)],
+def test_posting_feedback_without_mark_updates_root_feedback(
+    client, assessment_factory
+):
+    assessment = assessment_factory(
+        code="y2023_12345_exam",
+        with_students=[
+            dict(
+                username="hpotter",
+                with_marks=[dict(**valid_section)],
+            )
+        ],
     )
+    [student] = assessment.candidates
     [mark] = student.marks
 
     with freeze_time(mark_posting_ts):
@@ -130,8 +162,11 @@ def test_posting_feedback_without_mark_updates_root_feedback(client, student_fac
     assert mark_["timestamp"] == "2024-05-01T14:22:00+00:00"
 
 
-def test_posting_mark_and_feedback_for_section(client, student_factory):
-    student_factory(exam_id="y2023_12345_exam", username="hpotter")
+def test_posting_mark_and_feedback_for_section(client, assessment_factory):
+    assessment_factory(
+        code="y2023_12345_exam",
+        with_students=[dict(username="hpotter")],
+    )
     res = client("y2023_12345_exam").post(
         f"/hpotter/marks",
         json={**valid_section, "mark": 2.5, "feedback": "Some comment"},
@@ -144,11 +179,17 @@ def test_posting_mark_and_feedback_for_section(client, student_factory):
     assert mark_["feedback"] == "Some comment"
 
 
-def test_posting_mark_without_feedback_adds_to_mark_history(client, student_factory):
-    student = student_factory(
-        exam_id="y2023_12345_exam",
-        with_marks=[dict(**valid_section, with_history=1)],
+def test_posting_mark_without_feedback_adds_to_mark_history(client, assessment_factory):
+    assessment = assessment_factory(
+        code="y2023_12345_exam",
+        with_students=[
+            dict(
+                username="hpotter",
+                with_marks=[dict(**valid_section, with_history=1)],
+            )
+        ],
     )
+    [student] = assessment.candidates
     [mark] = student.marks
     with freeze_time(mark_posting_ts):
         res = client("y2023_12345_exam").post(
@@ -165,11 +206,17 @@ def test_posting_mark_without_feedback_adds_to_mark_history(client, student_fact
     assert latest_mark["mark"] == 2.5
 
 
-def test_posting_feedback_without_mark_adds_to_mark_history(client, student_factory):
-    student = student_factory(
-        exam_id="y2023_12345_exam",
-        with_marks=[dict(**valid_section, with_history=1)],
+def test_posting_feedback_without_mark_adds_to_mark_history(client, assessment_factory):
+    assessment = assessment_factory(
+        code="y2023_12345_exam",
+        with_students=[
+            dict(
+                username="hpotter",
+                with_marks=[dict(**valid_section, with_history=1)],
+            )
+        ],
     )
+    [student] = assessment.candidates
     [mark] = student.marks
     with freeze_time(mark_posting_ts):
         res = client("y2023_12345_exam").post(
@@ -190,13 +237,16 @@ def test_posting_feedback_without_mark_adds_to_mark_history(client, student_fact
 # ----------------- tests for /{student_username}/answers
 
 
-def test_can_get_all_student_answers_for_exam(client, student_factory):
-    student_factory(
-        username="hpotter",
-        exam_id="y2023_12345_exam",
-        with_answers=[dict(question=1) for _ in range(5)],
+def test_can_get_all_student_answers_for_exam(client, assessment_factory):
+    assessment_factory(
+        code="y2023_12345_exam",
+        with_students=[
+            dict(
+                username="hpotter",
+                with_answers=[dict(question=1) for _ in range(5)],
+            )
+        ],
     )
-
     res = client("y2023_12345_exam").get("/hpotter/answers")
     assert res.status_code == 200
     assert len(res.json()) == 5
@@ -208,12 +258,17 @@ def test_gets_empty_list_response_if_no_answers_exist_for_assessment(client):
     assert len(res.json()) == 0
 
 
-def test_response_answer_has_expected_fields(client, student_factory):
-    student = student_factory(
-        username="hpotter",
-        exam_id="y2023_12345_exam",
-        with_answers=1,
+def test_response_answer_has_expected_fields(client, assessment_factory):
+    assessment = assessment_factory(
+        code="y2023_12345_exam",
+        with_students=[
+            dict(
+                username="hpotter",
+                with_answers=1,
+            )
+        ],
     )
+    [student] = assessment.candidates
     [answer] = student.answers
 
     res = client("y2023_12345_exam").get(f"/hpotter/answers")

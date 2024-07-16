@@ -2,22 +2,30 @@ username = "hpotter"
 PREFIX = f"/answers/{username}"
 
 
-def test_can_get_a_part_for_student(client, student_factory):
-    student_factory(
-        username="hpotter",
-        exam_id="y2023_12345_exam",
-        with_answers=[dict(question=1, part=1, section=1)],
+def test_can_get_a_part_for_student(client, assessment_factory):
+    assessment_factory(
+        code="y2023_12345_exam",
+        with_students=[
+            dict(
+                username="hpotter",
+                with_answers=[dict(question=1, part=1, section=1)],
+            )
+        ],
     )
     res = client("y2023_12345_exam").get(f"{PREFIX}/question/1/part/1/section/1")
     assert res.status_code == 200
     assert len(res.json()) == 1
 
 
-def test_can_get_user_answers_for_question(client, student_factory):
-    student_factory(
-        username="hpotter",
-        exam_id="y2023_12345_exam",
-        with_answers=[dict(question=1), dict(question=1), dict(question=1)],
+def test_can_get_user_answers_for_question(client, assessment_factory):
+    assessment_factory(
+        code="y2023_12345_exam",
+        with_students=[
+            dict(
+                username="hpotter",
+                with_answers=[dict(question=1), dict(question=1), dict(question=1)],
+            )
+        ],
     )
 
     res = client("y2023_12345_exam").get(f"{PREFIX}/question/1")
@@ -25,12 +33,17 @@ def test_can_get_user_answers_for_question(client, student_factory):
     assert len(res.json()) == 3
 
 
-def test_response_answer_has_expected_fields(client, answer_factory, student_factory):
-    student = student_factory(
-        exam_id="y2023_12345_exam",
-        username="hpotter",
-        with_answers=1,
+def test_response_answer_has_expected_fields(client, assessment_factory):
+    assessment = assessment_factory(
+        code="y2023_12345_exam",
+        with_students=[
+            dict(
+                username="hpotter",
+                with_answers=1,
+            )
+        ],
     )
+    [student] = assessment.candidates
     [answer] = student.answers
 
     res = client("y2023_12345_exam").get(f"{PREFIX}/question/{answer.question}")
@@ -49,8 +62,15 @@ def test_gets_empty_list_response_if_no_answers_exist_for_assessment(client):
     assert len(res.json()) == 0
 
 
-def test_can_upload_answers(client, student_factory):
-    student_factory(exam_id="y2023_12345_exam", username="hpotter")
+def test_can_upload_answers(client, assessment_factory):
+    assessment_factory(
+        code="y2023_12345_exam",
+        with_students=[
+            dict(
+                username="hpotter",
+            )
+        ],
+    )
     client("y2023_12345_exam").post(
         f"{PREFIX}/question/1",
         json=[
@@ -72,9 +92,14 @@ def test_can_upload_answers(client, student_factory):
     assert answer_["answer"] == "This is an answer"
 
 
-def test_can_upload_answers_for_multiple_users(client, student_factory):
-    student_factory(exam_id="y2023_12345_exam", username="hpotter")
-    student_factory(exam_id="y2023_12345_exam", username="hgranger")
+def test_can_upload_answers_for_multiple_users(client, assessment_factory):
+    assessment_factory(
+        code="y2023_12345_exam",
+        with_students=[
+            dict(username="hpotter"),
+            dict(username="hgranger"),
+        ],
+    )
     res = client("y2023_12345_exam").post(
         "/answers/hgranger/question/1",
         json=[

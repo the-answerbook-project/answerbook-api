@@ -1,4 +1,5 @@
 import os
+import secrets
 from pathlib import Path
 
 DEV_ASSESSMENTS_DIR = Path(__file__).parent.parent / "yaml_examples"
@@ -16,3 +17,6 @@ class Settings(BaseSettings):
     environment: str = os.getenv("ENVIRONMENT", "development")
     assessments_dir: Path = _get_assessment_dir()
     testing: bool = bool(os.getenv("TESTING", 0))
+    secret_key: str = os.getenv("SECRET_KEY", secrets.token_hex(32))
+    ldap_server_url: str = os.getenv("LDAP_SERVER_URL", "ldap.example.com")
+    ldap_base_dn: str = os.getenv("LDAP_BASE_DN", "ou=people,dc=example,dc=com")

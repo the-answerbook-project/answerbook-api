@@ -3,7 +3,7 @@ from sqlmodel import Session, select
 
 from api.dependencies import get_assessment, get_assessment_id, get_session
 from api.models.student import Student
-from api.schemas.exam import Assessment, AssessmentSummary, Question
+from api.schemas.exam import AssessmentSpec, AssessmentSummary, Question
 
 exam_router = APIRouter(tags=["exam"])
 
@@ -18,7 +18,7 @@ Retrieve the exam summary with user-specific start-time and end-time.
 """,
 )
 def get_summary(
-    assessment: Assessment = Depends(get_assessment),
+    assessment: AssessmentSpec = Depends(get_assessment),
 ):
     return AssessmentSummary(**assessment.dict())
 
@@ -31,7 +31,7 @@ def get_summary(
     description="Retrieve all the exam questions.",
 )
 def get_questions(
-    assessment: Assessment = Depends(get_assessment),
+    assessment: AssessmentSpec = Depends(get_assessment),
 ):
     return assessment.questions
 
