@@ -54,8 +54,9 @@ def populate_db():
                 dict(
                     username="hgranger",
                     with_answers=[
-                        dict(question=1, part=1, section=1, task=1),
+                        dict(question=1, part=1, section=1, task=1, answer="c,d"),
                         dict(question=1, part=1, section=1, task=2),
+                        dict(question=1, part=2, section=1, task=1, answer="a"),
                         dict(
                             question=1,
                             part=3,
@@ -76,8 +77,9 @@ def populate_db():
                 dict(
                     username="hpotter",
                     with_answers=[
-                        dict(question=1, part=1, section=1, task=1),
+                        dict(question=1, part=1, section=1, task=1, answer="c,e"),
                         dict(question=1, part=1, section=1, task=2),
+                        dict(question=1, part=2, section=1, task=1, answer="b"),
                         dict(
                             question=1,
                             part=3,
