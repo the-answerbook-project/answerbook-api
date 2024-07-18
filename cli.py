@@ -1,3 +1,4 @@
+import json
 from contextlib import contextmanager
 
 import typer
@@ -55,9 +56,21 @@ def populate_db():
                     with_answers=[
                         dict(question=1, part=1, section=1, task=1),
                         dict(question=1, part=1, section=1, task=2),
-                        dict(question=1, part=1, section=1, task=3),
+                        dict(
+                            question=1,
+                            part=3,
+                            section=1,
+                            task=1,
+                            answer=json.dumps({"latex": r"\frac{1}{3}x^{3}+C"}),
+                        ),
+                        dict(
+                            question=1,
+                            part=3,
+                            section=1,
+                            task=2,
+                            answer=json.dumps({"latex": r"2x"}),
+                        ),
                         dict(question=2, part=1, section=1, task=1),
-                        dict(question=3, part=1, section=1, task=1),
                     ],
                 ),
                 dict(
@@ -65,9 +78,21 @@ def populate_db():
                     with_answers=[
                         dict(question=1, part=1, section=1, task=1),
                         dict(question=1, part=1, section=1, task=2),
-                        dict(question=1, part=1, section=1, task=3),
+                        dict(
+                            question=1,
+                            part=3,
+                            section=1,
+                            task=1,
+                            answer=json.dumps({"latex": r"\int x^2"}),
+                        ),
+                        dict(
+                            question=1,
+                            part=3,
+                            section=1,
+                            task=2,
+                            answer=json.dumps({"latex": r"2x"}),
+                        ),
                         dict(question=2, part=1, section=1, task=1),
-                        dict(question=3, part=1, section=1, task=1),
                     ],
                 ),
             ],

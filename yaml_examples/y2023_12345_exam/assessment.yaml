@@ -81,16 +81,17 @@ rubric:
     instructions: |
       Calculus questions
     i:
-      instructions: |
-        Calculate the derivative of $x^2$.
-      maximum mark: 50
+      maximum mark: 30
       tasks:
       - instructions: |
-          Enter your working below.
-        type: raw handwriting
-      - instructions: |
-          Enter the derivative.
+          Enter the integral of $x^2$
         type: processed handwriting
+      - instructions: |
+          Enter the derivative of $x^2$.
+        type: processed handwriting
+      - instructions: |
+          Show your working.
+        type: raw handwriting
 2:
   title: Maths.
   show part weights: true
