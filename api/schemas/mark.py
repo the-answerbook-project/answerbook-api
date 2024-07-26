@@ -32,3 +32,12 @@ class MarkWrite(SQLModel):
     section: int
     mark: float | None = None
     feedback: str | None = None
+
+
+class MarkWrite_(SQLModel):
+    username: str
+    question: int
+    part: int
+    section: int
+    mark: float | None = None
+    feedback: str | None = None

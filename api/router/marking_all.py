@@ -11,6 +11,7 @@ from api.schemas.answer import AnswerRead
 from api.schemas.mark import (
     MarkRead,
     MarkWrite,
+    MarkWrite_,
 )
 
 marking_all_router = APIRouter(tags=["marking"])
@@ -46,8 +47,7 @@ Record a mark and/or feedback comment on a specific section of the given student
 """,
 )
 def post_mark_for_section(
-    student_username: str,
-    payload: MarkWrite,
+    payload: MarkWrite_,
     session: Session = Depends(get_session),
     assessment_id: str = Depends(get_assessment_id),
 ):
@@ -59,7 +59,7 @@ def post_mark_for_section(
 
     query = select(Mark).where(
         Mark.exam_id == assessment_id,
-        Mark.username == student_username,
+        Mark.username == payload.username,
         Mark.question == payload.question,
         Mark.part == payload.part,
         Mark.section == payload.section,
@@ -80,7 +80,7 @@ def post_mark_for_section(
             section=payload.section,
             mark=payload.mark,
             feedback=payload.feedback,
-            username=student_username,
+            username=payload.username,
             marker="adumble",
         )
         session.add(mark)

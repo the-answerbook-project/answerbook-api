@@ -89,9 +89,10 @@ def test_mark_history_has_expected_fields(client_, assessment_factory):
     assert "marker" in history_entry
 
 
-def test_cannot_post_to_marks_with_no_mark_and_no_feedback(client):
-    res = client("y2023_12345_exam").post(
-        f"/hpotter/marks", json={**valid_section, "feedback": None, "mark": None}
+def test_cannot_post_to_marks_with_no_mark_and_no_feedback(client_):
+    res = client_.post(
+        "/marks",
+        json={**valid_section, "username": "hpotter", "feedback": None, "mark": None},
     )
 
     assert res.status_code == 400
@@ -101,93 +102,86 @@ def test_cannot_post_to_marks_with_no_mark_and_no_feedback(client):
     )
 
 
-def test_posting_mark_without_feedback_updates_root_mark(client, assessment_factory):
+def test_posting_mark_without_feedback_updates_root_mark(client_, assessment_factory):
     assessment = assessment_factory(
         code="y2023_12345_exam",
         with_students=[
-            dict(
-                username="hpotter",
-                with_marks=[dict(**valid_section, with_history=1)],
-            )
+            dict(username="hpotter", with_marks=[dict(**valid_section, with_history=1)])
         ],
     )
     [student] = assessment.candidates
     [mark] = student.marks
 
     with freeze_time(mark_posting_ts):
-        res = client("y2023_12345_exam").post(
-            f"/{mark.username}/marks", json={**valid_section, "mark": 2.5}
+        res = client_.post(
+            "/marks", json={**valid_section, "username": "hpotter", "mark": 2.5}
         )
 
     assert res.status_code == 200
-    mark_ = res.json()
-    assert mark_["mark"] == 2.5
-    assert mark_["marker"] == "adumble"  # Currently implicit
-    assert mark_["feedback"] == mark.feedback
-    assert mark_["timestamp"] == "2024-05-01T14:22:00+00:00"
+    res_mark = res.json()
+    assert res_mark["mark"] == 2.5
+    assert res_mark["marker"] == "adumble"  # Currently implicit
+    assert res_mark["feedback"] == mark.feedback
+    assert res_mark["timestamp"] == "2024-05-01T14:22:00+00:00"
 
 
 def test_posting_feedback_without_mark_updates_root_feedback(
-    client, assessment_factory
+    client_, assessment_factory
 ):
     assessment = assessment_factory(
         code="y2023_12345_exam",
-        with_students=[
-            dict(
-                username="hpotter",
-                with_marks=[dict(**valid_section)],
-            )
-        ],
+        with_students=[dict(username="hpotter", with_marks=[dict(**valid_section)])],
     )
     [student] = assessment.candidates
     [mark] = student.marks
 
     with freeze_time(mark_posting_ts):
-        res = client("y2023_12345_exam").post(
-            f"/{mark.username}/marks",
-            json={**valid_section, "feedback": "Some comment"},
+        res = client_.post(
+            "/marks",
+            json={**valid_section, "username": "hpotter", "feedback": "Some comment"},
         )
 
     assert res.status_code == 200
-    mark_ = res.json()
-    assert mark_["mark"] == mark.mark
-    assert mark_["marker"] == "adumble"  # Currently implicit
-    assert mark_["feedback"] == "Some comment"
-    assert mark_["timestamp"] == "2024-05-01T14:22:00+00:00"
+    res_mark = res.json()
+    assert res_mark["mark"] == mark.mark
+    assert res_mark["marker"] == "adumble"  # Currently implicit
+    assert res_mark["feedback"] == "Some comment"
+    assert res_mark["timestamp"] == "2024-05-01T14:22:00+00:00"
 
 
-def test_posting_mark_and_feedback_for_section(client, assessment_factory):
+def test_posting_mark_and_feedback_for_section(client_, assessment_factory):
     assessment_factory(
-        code="y2023_12345_exam",
-        with_students=[dict(username="hpotter")],
+        code="y2023_12345_exam", with_students=[dict(username="hpotter")]
     )
-    res = client("y2023_12345_exam").post(
-        f"/hpotter/marks",
-        json={**valid_section, "mark": 2.5, "feedback": "Some comment"},
+    res = client_.post(
+        "/marks",
+        json={
+            **valid_section,
+            "username": "hpotter",
+            "mark": 2.5,
+            "feedback": "Some comment",
+        },
     )
 
     assert res.status_code == 200
-    mark_ = res.json()
-    assert mark_["mark"] == 2.5
-    assert mark_["marker"] == "adumble"  # Currently implicit
-    assert mark_["feedback"] == "Some comment"
+    mark = res.json()
+    assert mark["mark"] == 2.5
+    assert mark["marker"] == "adumble"  # Currently implicit
+    assert mark["feedback"] == "Some comment"
 
 
-def test_posting_mark_without_feedback_adds_to_mark_history(client, assessment_factory):
-    assessment = assessment_factory(
+def test_posting_mark_without_feedback_adds_to_mark_history(
+    client_, assessment_factory
+):
+    assessment_factory(
         code="y2023_12345_exam",
         with_students=[
-            dict(
-                username="hpotter",
-                with_marks=[dict(**valid_section, with_history=1)],
-            )
+            dict(username="hpotter", with_marks=[dict(**valid_section, with_history=1)])
         ],
     )
-    [student] = assessment.candidates
-    [mark] = student.marks
     with freeze_time(mark_posting_ts):
-        res = client("y2023_12345_exam").post(
-            f"/{mark.username}/marks", json={**valid_section, "mark": 2.5}
+        res = client_.post(
+            "/marks", json={**valid_section, "username": "hpotter", "mark": 2.5}
         )
 
     assert res.status_code == 200
@@ -200,22 +194,19 @@ def test_posting_mark_without_feedback_adds_to_mark_history(client, assessment_f
     assert latest_mark["mark"] == 2.5
 
 
-def test_posting_feedback_without_mark_adds_to_mark_history(client, assessment_factory):
-    assessment = assessment_factory(
+def test_posting_feedback_without_mark_adds_to_mark_history(
+    client_, assessment_factory
+):
+    assessment_factory(
         code="y2023_12345_exam",
         with_students=[
-            dict(
-                username="hpotter",
-                with_marks=[dict(**valid_section, with_history=1)],
-            )
+            dict(username="hpotter", with_marks=[dict(**valid_section, with_history=1)])
         ],
     )
-    [student] = assessment.candidates
-    [mark] = student.marks
     with freeze_time(mark_posting_ts):
-        res = client("y2023_12345_exam").post(
-            f"/{mark.username}/marks",
-            json={**valid_section, "feedback": "Some comment"},
+        res = client_.post(
+            "/marks",
+            json={**valid_section, "username": "hpotter", "feedback": "Some comment"},
         )
 
     assert res.status_code == 200
@@ -228,7 +219,7 @@ def test_posting_feedback_without_mark_adds_to_mark_history(client, assessment_f
     assert latest_mark["mark"] == None
 
 
-# ----------------- tests for /{student_username}/answers
+# ANSWERS =================================
 
 
 def test_can_get_answers(client_, assessment_factory):
