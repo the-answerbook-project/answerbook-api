@@ -15,6 +15,7 @@ class MarkHistoryRead(BaseSchema):
 
 class MarkRead(BaseSchema):
     id: int
+    username: str
     question: int
     part: int
     section: int
