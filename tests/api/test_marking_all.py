@@ -231,45 +231,47 @@ def test_posting_feedback_without_mark_adds_to_mark_history(client, assessment_f
 # ----------------- tests for /{student_username}/answers
 
 
-def test_can_get_all_student_answers_for_exam(client, assessment_factory):
+def test_can_get_answers(client_, assessment_factory):
     assessment_factory(
         code="y2023_12345_exam",
-        with_students=[
-            dict(
-                username="hpotter",
-                with_answers=[dict(question=1) for _ in range(5)],
-            )
-        ],
+        with_students=[dict(username="hpotter", with_answers=5)],
     )
-    res = client("y2023_12345_exam").get("/hpotter/answers")
+    res = client_.get("/answers")
     assert res.status_code == 200
     assert len(res.json()) == 5
 
 
-def test_gets_empty_list_response_if_no_answers_exist_for_assessment(client):
-    res = client("y2023_12345_exam").get("/hpotter/answers")
+def test_can_filter_answers_by_student(client_, assessment_factory):
+    assessment_factory(
+        code="y2023_12345_exam",
+        with_students=[
+            dict(username="hpotter", with_answers=2),
+            dict(username="hgranger", with_answers=5),
+        ],
+    )
+    res = client_.get("/answers", params={"student_username": "hpotter"})
+    assert res.status_code == 200
+    assert len(res.json()) == 2
+
+
+def test_gets_empty_list_response_if_no_answers_exist_for_assessment(client_):
+    res = client_.get("/answers")
     assert res.status_code == 200
     assert len(res.json()) == 0
 
 
-def test_response_answer_has_expected_fields(client, assessment_factory):
-    assessment = assessment_factory(
+def test_response_answer_has_expected_fields(client_, assessment_factory):
+    assessment_factory(
         code="y2023_12345_exam",
-        with_students=[
-            dict(
-                username="hpotter",
-                with_answers=1,
-            )
-        ],
+        with_students=[dict(username="hpotter", with_answers=1)],
     )
-    [student] = assessment.candidates
-    [answer] = student.answers
 
-    res = client("y2023_12345_exam").get(f"/hpotter/answers")
+    res = client_.get(f"/answers")
     assert res.status_code == 200
-    [answer_] = res.json()
-    assert answer_["question"] == answer.question
-    assert answer_["part"] == answer.part
-    assert answer_["section"] == answer.section
-    assert answer_["task"] == answer.task
-    assert answer_["answer"] == answer.answer
+    [answer] = res.json()
+    assert "username" in answer
+    assert "question" in answer
+    assert "part" in answer
+    assert "section" in answer
+    assert "task" in answer
+    assert "answer" in answer

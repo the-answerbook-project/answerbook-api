@@ -101,21 +101,18 @@ def post_mark_for_section(
     "/answers",
     response_model=list[AnswerRead],
     summary="Retrieve student answers for all questions in exam",
-    description="""
-Retrieve the latest answers for all questions in exam
-""",
+    description="Retrieve the latest answers for all questions in exam",
 )
-def get_answers_for_student(
-    student_username: str,
+def get_answers(
+    student_username: str | None = None,
     session: Session = Depends(get_session),
     assessment_id: str = Depends(get_assessment_id),
 ):
     query = (
         select(Answer)
-        .where(
-            Answer.exam_id == assessment_id,
-            Answer.username == student_username,
-        )
+        .where(Answer.exam_id == assessment_id)
         .order_by(Answer.question, Answer.part, Answer.section, Answer.task)  # type: ignore
     )
+    if student_username:
+        query = query.where(Answer.username == student_username)
     return session.exec(query).all()
