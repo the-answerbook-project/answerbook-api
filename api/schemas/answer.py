@@ -8,3 +8,11 @@ class AnswerRead(SQLModel):
     section: int
     task: int
     answer: str
+
+
+class AnswerWrite(SQLModel):
+    question: int
+    part: int
+    section: int
+    task: int
+    answer: str

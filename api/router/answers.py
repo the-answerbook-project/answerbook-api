@@ -3,7 +3,7 @@ from sqlmodel import Session, select
 
 from api.dependencies import get_assessment_id, get_session
 from api.models.answer import Answer
-from api.schemas.answer import AnswerRead
+from api.schemas.answer import AnswerRead, AnswerWrite
 
 answers_router = APIRouter(prefix="/answers/{username}", tags=["exam"])
 
@@ -74,7 +74,7 @@ Submit the user answer to the given question's task.
 def submit_answer_to_question(
     question_number: int,
     username: str,
-    answers: list[AnswerRead],
+    answers: list[AnswerWrite],
     session: Session = Depends(get_session),
     assessment_id: str = Depends(get_assessment_id),
 ):
