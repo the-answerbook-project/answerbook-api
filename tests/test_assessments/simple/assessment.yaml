@@ -6,6 +6,12 @@ alternative codes:
 begins: 2019-01-01T08:00:00Z
 duration: 120
 upload time: 30
+
+delayed_start:
+  hpotter: 7 minutes
+  username1: 20 minutes
+  username2: 13 minutes
+  username3: 25 minutes
 extensions:
   username1: 20 minutes
   username2: 13 minutes
