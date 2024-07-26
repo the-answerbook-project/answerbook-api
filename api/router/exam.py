@@ -20,7 +20,7 @@ Retrieve the exam summary with user-specific start-time and end-time.
 def get_summary(
     assessment: AssessmentSpec = Depends(get_assessment),
 ):
-    return AssessmentSummary(**assessment.dict())
+    return AssessmentSummary(**assessment.model_dump())
 
 
 @exam_router.get(
