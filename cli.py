@@ -5,6 +5,7 @@ import typer
 from sqlalchemy import text
 from sqlmodel import SQLModel
 
+from api.authentication.internal_authentication import pwd_context
 from api.dependencies import get_session
 from api.factories import (
     AssessmentFactory,
@@ -50,6 +51,10 @@ def populate_db():
     with dynamic_session():
         AssessmentFactory(
             code="y2023_12345_exam",
+            with_credentials=[
+                dict(username="hpotter", hashed_password=pwd_context.hash("pass")),
+                dict(username="hgranger", hashed_password=pwd_context.hash("pass")),
+            ],
             with_students=[
                 dict(
                     username="hgranger",
