@@ -2,9 +2,9 @@ from datetime import datetime, timedelta, timezone
 
 import jwt
 from fastapi import APIRouter, Depends, HTTPException, Response
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
-from sqlmodel import Session, select
+from sqlmodel import Session
 from starlette import status
 
 from api.authentication.internal_authentication import (
@@ -31,11 +31,6 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 JWT_ALGO = "HS256"
 TWO_HOURS_IN_MINUTES = 120
-
-
-class Credentials(BaseModel):
-    username: str
-    password: str
 
 
 class JwtSubject(BaseModel):
@@ -104,8 +99,8 @@ Possible authentication methods are
 """,
 )
 def login(
-    credentials: Credentials,
     assessment_code: str,
+    credentials: OAuth2PasswordRequestForm = Depends(),
     ldap_authenticator: LdapAuthenticator = Depends(get_ldap_authenticator),
     config: Assessment | None = Depends(get_assessment_config),
     spec: AssessmentSpec | None = Depends(get_assessment_spec),

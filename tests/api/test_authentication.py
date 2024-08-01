@@ -15,7 +15,7 @@ from api.router.authentication import calculate_token_expiration, create_access_
 
 def test_logging_in_to_assessment_with_no_configuration_gives_404(client_):
     res = client_.post(
-        "/not_exists/auth/login", json=dict(username="hpotter", password="password")
+        "/not_exists/auth/login", data=dict(username="hpotter", password="password")
     )
     assert res.status_code == 404
     assert res.json()["detail"] == "Assessment not found."
@@ -27,7 +27,7 @@ def test_logging_in_to_assessment_with_no_specification_gives_404(
     assessment_factory(code="y1234_4321_exam")
     res = client_.post(
         "/y1234_4321_exam/auth/login",
-        json=dict(username="hpotter", password="password"),
+        data=dict(username="hpotter", password="password"),
     )
     assert res.status_code == 404
     assert res.json()["detail"] == "Assessment not found."
@@ -39,7 +39,7 @@ def test_cannot_login_to_assessment_if_not_candidate_or_marker(
     assessment_factory(code="y2023_12345_exam")
     res = client_.post(
         "/y2023_12345_exam/auth/login",
-        json=dict(username="hpotter", password="password"),
+        data=dict(username="hpotter", password="password"),
     )
     assert res.status_code == 401
     assert res.json()["detail"] == "Username not registered for assessment."
@@ -55,7 +55,7 @@ def test_internal_authentication_login_fails_for_missing_credentials(
     )
     res = client_.post(
         "/y2023_12345_exam/auth/login",
-        json=dict(username="hpotter", password="password"),
+        data=dict(username="hpotter", password="password"),
     )
 
     assert res.status_code == 401
@@ -77,7 +77,7 @@ def test_internal_authentication_login_fails_for_invalid_credentials(
     )
     res = client_.post(
         "/y2023_12345_exam/auth/login",
-        json=dict(username="hpotter", password="password"),
+        data=dict(username="hpotter", password="password"),
     )
 
     assert res.status_code == 401
@@ -98,7 +98,7 @@ def test_internal_authentication_login_with_valid_credentials_returns_token(
     )
     res = client_.post(
         "/y2023_12345_exam/auth/login",
-        json=dict(username="hpotter", password=pwd),
+        data=dict(username="hpotter", password=pwd),
     )
 
     assert res.status_code == 200
@@ -123,7 +123,7 @@ def test_ldap_authentication_login_with_valid_credentials_returns_token(
 
     res = TestClient(app).post(
         "/y2023_12345_exam/auth/login",
-        json=dict(username="hpotter", password="password"),
+        data=dict(username="hpotter", password="password"),
     )
     assert res.status_code == 200
     mock_ldap_authentication.assert_called_once_with("hpotter", "password")
