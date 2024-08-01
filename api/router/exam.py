@@ -1,11 +1,15 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
+from starlette import status
 
-from api.dependencies import get_assessment, get_assessment_id, get_session
+from api.dependencies import (
+    get_assessment_spec,
+    get_session,
+)
 from api.models.student import Student
 from api.schemas.exam import AssessmentSpec, AssessmentSummary, Question
 
-exam_router = APIRouter(tags=["exam"])
+exam_router = APIRouter(prefix="/{assessment_code}", tags=["exam"])
 
 
 @exam_router.get(
@@ -18,8 +22,13 @@ Retrieve the exam summary with user-specific start-time and end-time.
 """,
 )
 def get_summary(
-    assessment: AssessmentSpec = Depends(get_assessment),
+    assessment: AssessmentSpec | None = Depends(get_assessment_spec),
 ):
+    if assessment is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Assessment not found.",
+        )
     return AssessmentSummary(**assessment.model_dump())
 
 
@@ -31,8 +40,13 @@ def get_summary(
     description="Retrieve all the exam questions.",
 )
 def get_questions(
-    assessment: AssessmentSpec = Depends(get_assessment),
+    assessment: AssessmentSpec | None = Depends(get_assessment_spec),
 ):
+    if assessment is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Assessment not found.",
+        )
     return assessment.questions
 
 
@@ -44,10 +58,10 @@ def get_questions(
     description="Retrieve all the students enrolled for the exam",
 )
 def get_students(
-    assessment_id: str = Depends(get_assessment_id),
+    assessment_code: str,
     session: Session = Depends(get_session),
 ):
     query = select(Student).where(
-        Student.exam_id == assessment_id,
+        Student.exam_id == assessment_code,
     )
     return session.exec(query).all()

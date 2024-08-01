@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 from starlette import status
 
-from api.dependencies import get_assessment_id, get_session
+from api.dependencies import get_session
 from api.models.answer import Answer
 from api.models.mark import Mark, MarkHistory
 from api.schemas.answer import AnswerRead
@@ -13,30 +13,27 @@ from api.schemas.mark import (
     MarkWrite,
 )
 
-marking_router = APIRouter(prefix="/{student_username}", tags=["marking"])
+marking_router = APIRouter(prefix="/{assessment_code}", tags=["marking"])
 
 
 @marking_router.get(
     "/marks",
     response_model=list[MarkRead],
-    summary="Retrieve user marks and feedback for exam questions",
-    description="""
-Retrieve the latest (and historical) marks for answers to a question by user
-""",
+    summary="Retrieve marks and feedback for exam questions",
+    description="Retrieve latest marks and feedback (with corresponding history)",
 )
-def get_marks_for_question(
-    student_username: str,
+def get_marks(
+    assessment_code: str,
+    student_username: str | None = None,
     session: Session = Depends(get_session),
-    assessment_id: str = Depends(get_assessment_id),
 ):
     query = (
         select(Mark)
-        .where(
-            Mark.exam_id == assessment_id,
-            Mark.username == student_username,
-        )
+        .where(Mark.exam_id == assessment_code)
         .order_by(Mark.question, Mark.part, Mark.section)  # type: ignore
     )
+    if student_username:
+        query = query.where(Mark.username == student_username)
     return session.exec(query).all()
 
 
@@ -49,10 +46,9 @@ Record a mark and/or feedback comment on a specific section of the given student
 """,
 )
 def post_mark_for_section(
-    student_username: str,
     payload: MarkWrite,
+    assessment_code: str,
     session: Session = Depends(get_session),
-    assessment_id: str = Depends(get_assessment_id),
 ):
     if payload.mark is None and not payload.feedback:
         raise HTTPException(
@@ -61,8 +57,8 @@ def post_mark_for_section(
         )
 
     query = select(Mark).where(
-        Mark.exam_id == assessment_id,
-        Mark.username == student_username,
+        Mark.exam_id == assessment_code,
+        Mark.username == payload.username,
         Mark.question == payload.question,
         Mark.part == payload.part,
         Mark.section == payload.section,
@@ -77,13 +73,13 @@ def post_mark_for_section(
         mark.marker = "adumble"  # Currently hardcoded
     else:
         mark = Mark(
-            exam_id=assessment_id,
+            exam_id=assessment_code,
             question=payload.question,
             part=payload.part,
             section=payload.section,
             mark=payload.mark,
             feedback=payload.feedback,
-            username=student_username,
+            username=payload.username,
             marker="adumble",
         )
         session.add(mark)
@@ -104,21 +100,18 @@ def post_mark_for_section(
     "/answers",
     response_model=list[AnswerRead],
     summary="Retrieve student answers for all questions in exam",
-    description="""
-Retrieve the latest answers for all questions in exam
-""",
+    description="Retrieve the latest answers for all questions in exam",
 )
-def get_answers_for_student(
-    student_username: str,
+def get_answers(
+    assessment_code: str,
+    student_username: str | None = None,
     session: Session = Depends(get_session),
-    assessment_id: str = Depends(get_assessment_id),
 ):
     query = (
         select(Answer)
-        .where(
-            Answer.exam_id == assessment_id,
-            Answer.username == student_username,
-        )
+        .where(Answer.exam_id == assessment_code)
         .order_by(Answer.question, Answer.part, Answer.section, Answer.task)  # type: ignore
     )
+    if student_username:
+        query = query.where(Answer.username == student_username)
     return session.exec(query).all()

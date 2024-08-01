@@ -1,8 +1,8 @@
 from api.schemas.exam import TaskType
 
 
-def test_can_get_question_for_exam(client):
-    res = client("simple").get("/questions/1")
+def test_can_get_question_for_exam(client_):
+    res = client_.get("/simple/questions/1")
     assert res.status_code == 200
     q = res.json()
     assert q["title"] == "Title of the question"
@@ -26,7 +26,7 @@ def test_can_get_question_for_exam(client):
     ]
 
 
-def test_404_in_case_of_missing_question(client):
-    res = client("simple").get("/questions/2")
+def test_404_in_case_of_missing_question(client_):
+    res = client_.get("/simple/questions/2")
     assert res.status_code == 404
     assert res.json()["detail"] == "Question not found"

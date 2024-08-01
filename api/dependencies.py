@@ -40,19 +40,9 @@ def get_ldap_authenticator() -> LdapAuthenticator:
     )
 
 
-def get_assessment(
-    settings=Depends(get_settings), assessment_id=Depends(get_assessment_id)
-) -> AssessmentSpec:
-    assessment_dir = settings.assessments_dir / assessment_id
-    images_dir = assessment_dir / "images"
-    data = parse_yaml(assessment_dir / "assessment.yaml")
-    if images_dir.exists():
-        data = encode_images_in_instructions(data, images_dir)
-    return AssessmentSpec(**data)
-
-
-def get_assessment_spec(assessment_code: str) -> AssessmentSpec | None:
-    settings = get_settings()
+def get_assessment_spec(
+    assessment_code: str, settings: Settings = Depends(get_settings)
+) -> AssessmentSpec | None:
     assessment_dir = settings.assessments_dir / assessment_code
     images_dir = assessment_dir / "images"
     yaml_file = assessment_dir / "assessment.yaml"

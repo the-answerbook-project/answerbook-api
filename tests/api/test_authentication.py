@@ -36,9 +36,9 @@ def test_logging_in_to_assessment_with_no_specification_gives_404(
 def test_cannot_login_to_assessment_if_not_candidate_or_marker(
     client_, assessment_factory
 ):
-    assessment_factory(code="y2023_12345_exam")
+    assessment_factory(code="simple")
     res = client_.post(
-        "/y2023_12345_exam/auth/login",
+        "/simple/auth/login",
         data=dict(username="hpotter", password="password"),
     )
     assert res.status_code == 401
@@ -49,12 +49,12 @@ def test_internal_authentication_login_fails_for_missing_credentials(
     client_, assessment_factory
 ):
     assessment_factory(
-        code="y2023_12345_exam",
+        code="simple",
         authentication_mode=AuthenticationMode.INTERNAL,
         with_students=[dict(username="hpotter")],
     )
     res = client_.post(
-        "/y2023_12345_exam/auth/login",
+        "/simple/auth/login",
         data=dict(username="hpotter", password="password"),
     )
 
@@ -66,7 +66,7 @@ def test_internal_authentication_login_fails_for_invalid_credentials(
     client_, assessment_factory
 ):
     assessment_factory(
-        code="y2023_12345_exam",
+        code="simple",
         authentication_mode=AuthenticationMode.INTERNAL,
         with_students=[dict(username="hpotter")],
         with_credentials=[
@@ -76,7 +76,7 @@ def test_internal_authentication_login_fails_for_invalid_credentials(
         ],
     )
     res = client_.post(
-        "/y2023_12345_exam/auth/login",
+        "/simple/auth/login",
         data=dict(username="hpotter", password="password"),
     )
 
@@ -89,7 +89,7 @@ def test_internal_authentication_login_with_valid_credentials_returns_token(
 ):
     pwd = "password"
     assessment_factory(
-        code="y2023_12345_exam",
+        code="simple",
         authentication_mode=AuthenticationMode.INTERNAL,
         with_students=[dict(username="hpotter")],
         with_credentials=[
@@ -97,7 +97,7 @@ def test_internal_authentication_login_with_valid_credentials_returns_token(
         ],
     )
     res = client_.post(
-        "/y2023_12345_exam/auth/login",
+        "/simple/auth/login",
         data=dict(username="hpotter", password=pwd),
     )
 
@@ -111,7 +111,7 @@ def test_ldap_authentication_login_with_valid_credentials_returns_token(
     app, assessment_factory
 ):
     assessment_factory(
-        code="y2023_12345_exam",
+        code="simple",
         authentication_mode=AuthenticationMode.LDAP,
         with_students=[dict(username="hpotter")],
     )
@@ -122,7 +122,7 @@ def test_ldap_authentication_login_with_valid_credentials_returns_token(
     app.dependency_overrides[get_ldap_authenticator] = lambda: authenticator
 
     res = TestClient(app).post(
-        "/y2023_12345_exam/auth/login",
+        "/simple/auth/login",
         data=dict(username="hpotter", password="password"),
     )
     assert res.status_code == 200
