@@ -2,9 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 from starlette import status
 
+from api.authentication.jwt_utils import oauth2_scheme
 from api.dependencies import (
     get_assessment_spec,
     get_session,
+    validate_token,
 )
 from api.models.student import Student
 from api.schemas.exam import AssessmentSpec, AssessmentSummary, Question
@@ -23,6 +25,7 @@ Retrieve the exam summary with user-specific start-time and end-time.
 )
 def get_summary(
     assessment: AssessmentSpec | None = Depends(get_assessment_spec),
+    _=Depends(validate_token),
 ):
     if assessment is None:
         raise HTTPException(

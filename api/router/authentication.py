@@ -2,14 +2,19 @@ from datetime import datetime, timedelta, timezone
 
 import jwt
 from fastapi import APIRouter, Depends, HTTPException, Response
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from pydantic import BaseModel
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session
 from starlette import status
 
 from api.authentication.internal_authentication import (
     get_user_credentials,
     verify_password,
+)
+from api.authentication.jwt_utils import (
+    JWT_ALGO,
+    TWO_HOURS_IN_MINUTES,
+    Token,
+    oauth2_scheme,
 )
 from api.authentication.ldap_authentication import LdapAuthenticator
 from api.dependencies import (
@@ -26,22 +31,6 @@ from api.schemas.exam import AssessmentSpec
 authentication_router = APIRouter(
     prefix="/{assessment_code}/auth", tags=["authentication"]
 )
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
-JWT_ALGO = "HS256"
-TWO_HOURS_IN_MINUTES = 120
-
-
-class JwtSubject(BaseModel):
-    username: str
-    role: str
-    assessment_code: str
-
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str
 
 
 def create_access_token(subject: dict, expires_delta: timedelta):

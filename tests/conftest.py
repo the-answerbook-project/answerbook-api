@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-from unittest.mock import Mock
 
 import pytest
 from fastapi import FastAPI
@@ -10,12 +9,11 @@ from sqlalchemy_utils import create_database, database_exists, drop_database
 from sqlmodel import Session, SQLModel, create_engine
 
 from api import create_application, factories
-from api.authentication.ldap_authentication import LdapAuthenticator
 from api.dependencies import (
     get_assessment_id,
-    get_ldap_authenticator,
     get_session,
     get_settings,
+    validate_token,
 )
 from api.settings import Settings
 
@@ -61,6 +59,9 @@ def session_fixture(db_engine):
 def app_fixture(session: Session):
     app: FastAPI = create_application()
 
+    def validate_token_override():
+        pass
+
     def get_session_override():
         return session
 
@@ -69,6 +70,7 @@ def app_fixture(session: Session):
 
     app.dependency_overrides[get_session] = get_session_override
     app.dependency_overrides[get_settings] = get_settings_override
+    app.dependency_overrides[validate_token] = validate_token_override
     yield app
     app.dependency_overrides.clear()
 
