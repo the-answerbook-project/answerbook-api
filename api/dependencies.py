@@ -73,7 +73,7 @@ def validate_token(
     token=Depends(oauth2_scheme),
     session: Session = Depends(get_session),
     assessment=Depends(get_assessment_config),
-):
+) -> JwtSubject:
     """
     We extract the token subject after validation.
     Validation of the token consists of checking for
@@ -100,5 +100,6 @@ def validate_token(
         )
         if not session.query(stmt).scalar():
             raise credentials_exception
+        return subject
     except InvalidTokenError as e:
         raise credentials_exception
