@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 from starlette import status
 
-from api.dependencies import get_session
+from api.dependencies import get_session, validate_token
 from api.models.answer import Answer
 from api.models.mark import Mark, MarkHistory
 from api.schemas.answer import AnswerRead
@@ -25,6 +25,7 @@ marking_router = APIRouter(prefix="/{assessment_code}", tags=["marking"])
 def get_marks(
     assessment_code: str,
     student_username: str | None = None,
+    _=Depends(validate_token),
     session: Session = Depends(get_session),
 ):
     query = (
@@ -48,6 +49,7 @@ Record a mark and/or feedback comment on a specific section of the given student
 def post_mark_for_section(
     payload: MarkWrite,
     assessment_code: str,
+    _=Depends(validate_token),
     session: Session = Depends(get_session),
 ):
     if payload.mark is None and not payload.feedback:
@@ -105,6 +107,7 @@ def post_mark_for_section(
 def get_answers(
     assessment_code: str,
     student_username: str | None = None,
+    _=Depends(validate_token),
     session: Session = Depends(get_session),
 ):
     query = (

@@ -44,6 +44,7 @@ def get_summary(
 )
 def get_questions(
     assessment: AssessmentSpec | None = Depends(get_assessment_spec),
+    _=Depends(validate_token),
 ):
     if assessment is None:
         raise HTTPException(
@@ -62,6 +63,7 @@ def get_questions(
 )
 def get_students(
     assessment_code: str,
+    _=Depends(validate_token),
     session: Session = Depends(get_session),
 ):
     query = select(Student).where(
