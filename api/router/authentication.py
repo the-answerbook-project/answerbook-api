@@ -27,6 +27,7 @@ from api.dependencies import (
 from api.models.assessment import Assessment, AuthenticationMode
 from api.models.revoked_token import RevokedToken
 from api.schemas.exam import AssessmentSpec
+from api.utils import parse_extension
 
 authentication_router = APIRouter(
     prefix="/{assessment_code}/auth", tags=["authentication"]
@@ -69,8 +70,7 @@ def authenticate_via_ldap(
 def calculate_token_expiration(
     assessment_duration: int, extensions: dict[str, str]
 ) -> timedelta:
-    max_extension = max(*extensions.values(), "0")
-    max_extension = max_extension.split(" ")[0].replace("minutes", "")
+    max_extension = parse_extension(max(*extensions.values(), "0"))
     minutes = assessment_duration
     minutes += int(max_extension)
     minutes += TWO_HOURS_IN_MINUTES
