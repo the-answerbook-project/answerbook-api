@@ -48,7 +48,7 @@ def get_ldap_authenticator() -> LdapAuthenticator:
 
 def get_assessment_spec(
     assessment_code: str, settings: Settings = Depends(get_settings)
-) -> AssessmentSpec | None:
+) -> AssessmentSpec:
     assessment_dir = settings.assessments_dir / assessment_code
     images_dir = assessment_dir / "images"
     yaml_file = assessment_dir / "assessment.yaml"
@@ -67,7 +67,7 @@ def get_assessment_spec(
 
 def get_assessment_config(
     assessment_code: str, session: Session = Depends(get_session)
-) -> Assessment | None:
+) -> Assessment:
     query = select(Assessment).where(Assessment.code == assessment_code)
     if config := session.exec(query).first():
         return config
