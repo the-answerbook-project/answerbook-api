@@ -91,16 +91,10 @@ def login(
     assessment_code: str,
     credentials: OAuth2PasswordRequestForm = Depends(),
     ldap_authenticator: LdapAuthenticator = Depends(get_ldap_authenticator),
-    config: Assessment | None = Depends(get_assessment_config),
-    spec: AssessmentSpec | None = Depends(get_assessment_spec),
+    spec: AssessmentSpec = Depends(get_assessment_spec),
+    config: Assessment = Depends(get_assessment_config),
     session: Session = Depends(get_session),
 ) -> Token:
-    if config is None or spec is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Assessment not found.",
-        )
-
     role = config.get_role(credentials.username)
     if role is None:
         raise HTTPException(

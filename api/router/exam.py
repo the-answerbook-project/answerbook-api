@@ -24,14 +24,9 @@ Retrieve the exam summary with user-specific start-time and end-time.
 """,
 )
 def get_summary(
-    assessment: AssessmentSpec | None = Depends(get_assessment_spec),
+    assessment: AssessmentSpec = Depends(get_assessment_spec),
     _=Depends(validate_token),
 ):
-    if assessment is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Assessment not found.",
-        )
     return AssessmentSummary(**assessment.model_dump())
 
 
@@ -43,14 +38,9 @@ def get_summary(
     description="Retrieve all the exam questions.",
 )
 def get_questions(
-    assessment: AssessmentSpec | None = Depends(get_assessment_spec),
+    assessment: AssessmentSpec = Depends(get_assessment_spec),
     _=Depends(validate_token),
 ):
-    if assessment is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Assessment not found.",
-        )
     return assessment.questions
 
 

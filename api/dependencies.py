@@ -54,7 +54,10 @@ def get_assessment_spec(
     yaml_file = assessment_dir / "assessment.yaml"
 
     if not yaml_file.exists():
-        return None
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Assessment not found.",
+        )
 
     data = parse_yaml(yaml_file)
     if images_dir.exists():
@@ -66,7 +69,12 @@ def get_assessment_config(
     assessment_code: str, session: Session = Depends(get_session)
 ) -> Assessment | None:
     query = select(Assessment).where(Assessment.code == assessment_code)
-    return session.exec(query).first()
+    if config := session.exec(query).first():
+        return config
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="Assessment not found.",
+    )
 
 
 def validate_token(

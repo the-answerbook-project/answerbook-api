@@ -22,14 +22,9 @@ The response include exam metadata, such as start time and end time for the curr
 )
 def get_question(
     question_number: int,
-    assessment: AssessmentSpec | None = Depends(get_assessment_spec),
+    assessment: AssessmentSpec = Depends(get_assessment_spec),
     _=Depends(validate_token),
 ):
-    if assessment is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Assessment not found.",
-        )
     if question_number not in assessment.questions:
         raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="Question not found")
     return assessment.questions[question_number]
