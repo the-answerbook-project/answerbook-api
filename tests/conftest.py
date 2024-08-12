@@ -9,6 +9,7 @@ from sqlalchemy_utils import create_database, database_exists, drop_database
 from sqlmodel import Session, SQLModel, create_engine
 
 from api import create_application, factories
+from api.authentication.jwt_utils import JwtSubject
 from api.dependencies import (
     get_assessment_id,
     get_session,
@@ -87,3 +88,20 @@ def client_fixture(app):
 @pytest.fixture(name="client_")
 def client_fixture_(app):
     return TestClient(app)
+
+
+@pytest.fixture(name="client_with_token")
+def client_with_token_fixture(app):
+    def _client_with_token(**kwargs):
+        sub = dict(
+            username="hpotter", role="CANDIDATE", assessment_code="y2023_12345_exam"
+        )
+
+        def validate_token_override():
+            sub.update(**kwargs)
+            return JwtSubject(**sub)
+
+        app.dependency_overrides[validate_token] = validate_token_override
+        return TestClient(app)
+
+    return _client_with_token
