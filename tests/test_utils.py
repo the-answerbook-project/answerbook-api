@@ -5,7 +5,7 @@ from api.utils import (
     is_single_lowercase_alpha,
     lowercase_alpha_to_int,
     lowercase_roman_to_int,
-    parse_extension,
+    parse_interval,
 )
 
 
@@ -92,7 +92,7 @@ def test_letter_to_int(input_letter, expected):
 )
 def test_parsing_invalid_extension_throws_value_error(invalid_extension):
     with pytest.raises(ValueError):
-        parse_extension(invalid_extension)
+        parse_interval(invalid_extension)
 
 
 @pytest.mark.parametrize(
@@ -107,4 +107,4 @@ def test_parsing_invalid_extension_throws_value_error(invalid_extension):
 def test_parsing_valid_extension_returns_expected_integer_value(
     extension_string, expected_int
 ):
-    assert parse_extension(extension_string) == expected_int
+    assert parse_interval(extension_string) == expected_int

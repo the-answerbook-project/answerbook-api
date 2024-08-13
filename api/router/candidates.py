@@ -10,7 +10,7 @@ from api.dependencies import (
 from api.models.answer import Answer
 from api.schemas.answer import AnswerRead
 from api.schemas.exam import AssessmentSpec, AssessmentSummary
-from api.utils import parse_extension
+from api.utils import parse_interval
 
 candidates_router = APIRouter(
     prefix="/{assessment_code}/candidates/me", tags=["candidates"]
@@ -27,7 +27,7 @@ def get_user_specific_exam_summary(
     assessment: AssessmentSpec = Depends(get_assessment_spec),
     sub: JwtSubject = Depends(validate_token),
 ):
-    assessment.duration += parse_extension(assessment.extensions.get(sub.username, "0"))
+    assessment.duration += parse_interval(assessment.extensions.get(sub.username, "0"))
     return AssessmentSummary(**assessment.model_dump())
 
 

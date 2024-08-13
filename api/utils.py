@@ -1,7 +1,7 @@
 import re
 
 LOWER_ROMAN_NUMERAL = r"^[ivxlcdm]+$"
-EXTENSION = r"^(\d+)\s*(minutes)?$"
+INTERVAL = r"^(\d+)\s*(minutes)?$"
 
 
 def is_single_lowercase_alpha(s: str) -> bool:
@@ -29,11 +29,11 @@ def lowercase_alpha_to_int(letter):
     return ord(letter.lower()) - ord("a") + 1
 
 
-def parse_extension(extension: str) -> int:
+def parse_interval(interval: str) -> int:
     """
     Parse a string of the form 'n' or 'n minutes' into the corresponding integer for 'n'
-    to be interpreted as a duration in minutes to add to the nominal duration of the corresponding assessment.
+    to be interpreted as a duration in minutes.
     """
-    if match := re.compile(EXTENSION).match(extension):
+    if match := re.compile(INTERVAL).match(interval):
         return int(match.group(1))
-    raise ValueError(f"Invalid extension: '{extension}'")
+    raise ValueError(f"Invalid interval: '{interval}'")
