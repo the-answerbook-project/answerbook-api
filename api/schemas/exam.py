@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from enum import StrEnum, auto
 
 from pydantic import field_validator, model_validator
@@ -10,6 +10,7 @@ from api.utils import (
     is_single_lowercase_alpha,
     lowercase_alpha_to_int,
     lowercase_roman_to_int,
+    parse_interval,
 )
 
 
@@ -121,6 +122,14 @@ class AssessmentSpec(SQLModel):
             int(k): Question(**q) for k, q in values.items() if k.isnumeric()
         }
         return values
+
+    def computed_beginning_for_candidate(self, username):
+        delay = parse_interval(self.delayed_starts.get(username, "0"))
+        return self.begins + timedelta(minutes=delay)
+
+    def computed_duration_for_candidate(self, username):
+        ext = parse_interval(self.extensions.get(username, "0"))
+        return self.duration + ext
 
 
 class AssessmentHeading(BaseSchema):
