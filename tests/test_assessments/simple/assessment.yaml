@@ -7,6 +7,8 @@ begins: 2019-01-01T08:00:00Z
 duration: 120
 extensions:
   hpotter: 20 minutes
+delayed_starts:
+  hpotter: 5 minutes
 labelled subparts: true
 rubric:
   instructions: Some general instructions for this exam.

@@ -27,7 +27,8 @@ def get_user_specific_assessment_heading(
     assessment: AssessmentSpec = Depends(get_assessment_spec),
     sub: JwtSubject = Depends(validate_token),
 ):
-    assessment.duration += parse_interval(assessment.extensions.get(sub.username, "0"))
+    assessment.begins = assessment.computed_beginning_for_candidate(sub.username)
+    assessment.duration = assessment.computed_duration_for_candidate(sub.username)
     return AssessmentHeading(**assessment.model_dump())
 
 

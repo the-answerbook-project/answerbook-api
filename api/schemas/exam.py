@@ -103,7 +103,8 @@ class AssessmentSpec(SQLModel):
     alternative_codes: list[str]
     begins: datetime
     duration: int
-    extensions: dict[str, str]
+    delayed_starts: dict[str, str] = {}
+    extensions: dict[str, str] = {}
     labelled_subparts: bool
     rubric: Rubric
     questions: dict[int, Question]

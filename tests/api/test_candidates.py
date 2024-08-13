@@ -1,10 +1,23 @@
-def test_candidate_cannot_get_summary_for_non_existing_spec(client_):
+from datetime import datetime, timezone
+
+
+def test_candidate_cannot_get_heading_for_non_existing_spec(client_):
     res = client_.get("/non-existing/candidates/me/heading")
     assert res.status_code == 404
     assert res.json()["detail"] == "Assessment not found."
 
 
-def test_candidate_with_extension_gets_summary_with_adjusted_duration(
+def test_candidate_with_delayed_start_gets_heading_with_adjusted_begins(
+    client_with_token,
+):
+    clt = client_with_token(username="hpotter", assessment_code="simple")
+    res = clt.get("/simple/candidates/me/heading")
+    expected_beginning = datetime(2019, 1, 1, 8, 5, tzinfo=timezone.utc)
+    assert res.status_code == 200
+    assert res.json()["begins"] == expected_beginning.strftime("%Y-%m-%dT%H:%M:%S%:z")
+
+
+def test_candidate_with_extension_gets_heading_with_adjusted_duration(
     client_with_token,
 ):
     clt = client_with_token(username="hpotter", assessment_code="simple")
@@ -13,7 +26,7 @@ def test_candidate_with_extension_gets_summary_with_adjusted_duration(
     assert res.json()["duration"] == 140
 
 
-def test_candidate_without_extension_gets_summary_with_standard_duration(
+def test_candidate_without_extension_gets_heading_with_standard_duration(
     client_with_token,
 ):
     clt = client_with_token(username="rweasley", assessment_code="simple")
