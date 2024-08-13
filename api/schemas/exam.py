@@ -123,7 +123,7 @@ class AssessmentSpec(SQLModel):
         return values
 
 
-class AssessmentSummary(BaseSchema):
+class AssessmentHeading(BaseSchema):
     course_code: str
     course_name: str
     begins: datetime

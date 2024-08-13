@@ -9,7 +9,7 @@ from api.dependencies import (
 )
 from api.models.answer import Answer
 from api.schemas.answer import AnswerRead
-from api.schemas.exam import AssessmentSpec, AssessmentSummary
+from api.schemas.exam import AssessmentHeading, AssessmentSpec
 from api.utils import parse_interval
 
 candidates_router = APIRouter(
@@ -18,17 +18,17 @@ candidates_router = APIRouter(
 
 
 @candidates_router.get(
-    "/exam-summary",
-    response_model=AssessmentSummary,
-    summary="Exam summary information",
-    description="Retrieve the exam summary with user-specific start-time and end-time.",
+    "/heading",
+    response_model=AssessmentHeading,
+    summary="Assessment heading",
+    description="Retrieve the assessment heading with user-specific start-time and end-time.",
 )
-def get_user_specific_exam_summary(
+def get_user_specific_assessment_heading(
     assessment: AssessmentSpec = Depends(get_assessment_spec),
     sub: JwtSubject = Depends(validate_token),
 ):
     assessment.duration += parse_interval(assessment.extensions.get(sub.username, "0"))
-    return AssessmentSummary(**assessment.model_dump())
+    return AssessmentHeading(**assessment.model_dump())
 
 
 @candidates_router.get(
