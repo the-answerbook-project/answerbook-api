@@ -14,7 +14,7 @@ from api.dependencies import (
     get_ldap_authenticator,
     validate_token,
 )
-from api.models.assessment import AuthenticationMode
+from api.models.assessment import AuthenticationMode, UserRole
 from api.models.revoked_token import RevokedToken
 from api.router.authentication import calculate_token_expiration, create_access_token
 
@@ -179,7 +179,11 @@ def test_token_validation_fails_with_401_if_token_subject_is_none(monkeypatch):
 
 
 def test_token_validation_fails_with_401_if_assessment_code_mismatches(monkeypatch):
-    subject = {"assessment_code": "123", "username": "hpotter", "role": "CANDIDATE"}
+    subject = {
+        "assessment_code": "123",
+        "username": "hpotter",
+        "role": UserRole.CANDIDATE,
+    }
     monkeypatch.setattr(jwt, "decode", lambda *args, **kwargs: {"sub": subject})
     with pytest.raises(HTTPException) as http_exception:
         validate_token(assessment=Mock(code="456"))
@@ -193,7 +197,7 @@ def test_token_validation_fails_with_401_if_student_username_doesnt_match(
     subject = {
         "assessment_code": assessment.code,
         "username": "hpotter",
-        "role": "CANDIDATE",
+        "role": UserRole.CANDIDATE,
     }
     monkeypatch.setattr(jwt, "decode", lambda *args, **kwargs: {"sub": subject})
     with pytest.raises(HTTPException) as http_exception:
@@ -208,7 +212,7 @@ def test_successful_token_validation_returns_token_payload(
     subject = {
         "assessment_code": assessment.code,
         "username": "hpotter",
-        "role": "CANDIDATE",
+        "role": UserRole.CANDIDATE,
     }
     monkeypatch.setattr(jwt, "decode", lambda *args, **kwargs: {"sub": subject})
     payload = validate_token(session=session, assessment=assessment)
