@@ -20,3 +20,11 @@ class Student(SQLModel, table=True):
     marks: list[Mark] = Relationship(
         sa_relationship_kwargs={"cascade": "all,delete,delete-orphan"},
     )
+
+
+class Marker(SQLModel, table=True):
+    id: int = Field(primary_key=True)
+    assessment_id: int = Field(default=None, foreign_key="assessment.id", index=True)
+    username: str = Field(nullable=False, unique=True)
+    firstname: str = Field(nullable=False)
+    lastname: str = Field(nullable=False)

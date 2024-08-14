@@ -4,7 +4,7 @@ from operator import attrgetter
 from sqlalchemy import Column
 from sqlmodel import Enum, Field, Relationship, SQLModel
 
-from api.models.student import Student
+from api.models.student import Marker, Student
 
 
 class AuthenticationMode(StrEnum):
@@ -36,6 +36,9 @@ class Assessment(SQLModel, table=True):
     )
 
     candidates: list[Student] = Relationship(
+        sa_relationship_kwargs={"cascade": "all,delete,delete-orphan"},
+    )
+    markers: list[Marker] = Relationship(
         sa_relationship_kwargs={"cascade": "all,delete,delete-orphan"},
     )
 
