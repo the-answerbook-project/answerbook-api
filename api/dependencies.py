@@ -6,14 +6,14 @@ from fastapi import Depends, HTTPException
 from jwt import InvalidTokenError
 from sqlalchemy import exists
 from sqlalchemy.exc import SQLAlchemyError
-from sqlmodel import Session, select
+from sqlmodel import Session, and_, or_, select
 from starlette import status
 
 from api.authentication.jwt_utils import JWT_ALGO, JwtSubject, oauth2_scheme
 from api.authentication.ldap_authentication import LdapAuthenticator
 from api.database.connection import engine
-from api.models.assessment import Assessment
-from api.models.student import Student
+from api.models.assessment import Assessment, UserRole
+from api.models.student import Marker, Student
 from api.schemas.exam import AssessmentSpec
 from api.settings import Settings
 from api.yaml_parser import encode_images_in_instructions, parse_yaml
@@ -101,13 +101,25 @@ def validate_token(
         subject = JwtSubject(**raw_subject)
         if subject.assessment_code != assessment.code:
             raise credentials_exception
-        # # TODO: will need a conditional choice once we introduce Marker
+        model: type[Student | Marker] = (
+            Student if subject.role == UserRole.CANDIDATE else Marker
+        )
         stmt = exists().where(
-            Student.username == subject.username,  # type: ignore
-            Student.assessment_id == assessment.id,
+            model.username == subject.username,  # type: ignore
+            model.assessment_id == assessment.id,
         )
         if not session.query(stmt).scalar():
             raise credentials_exception
         return subject
-    except InvalidTokenError as e:
+    except InvalidTokenError:
         raise credentials_exception
+
+
+def verify_user_is_marker(sub: JwtSubject = Depends(validate_token)) -> str:
+    if sub.role != UserRole.MARKER:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You don't have permissions to access this resource.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return sub.username
