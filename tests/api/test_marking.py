@@ -343,3 +343,24 @@ def test_student_has_expected_fields(marker_client, assessment_factory):
     assert student["lastname"] == student_.lastname
     assert student["username"] == student_.username
     assert student["degree_code"] == student_.degree_code
+
+
+@pytest.mark.parametrize(
+    "assessment_id, expected_questions", [("simple", 1), ("multiple_questions", 2)]
+)
+def test_can_get_questions_for_assessment(
+    marker_client, assessment_id, expected_questions
+):
+    res = marker_client.get(f"/{assessment_id}/questions")
+    assert res.status_code == 200
+    assert len(res.json()) == expected_questions
+
+
+def test_questions_for_exam_have_expected_fields(marker_client):
+    res = marker_client.get("/simple/questions")
+    assert res.status_code == 200
+    questions = res.json()
+    assert questions["1"]["title"] == "Title of the question"
+    assert questions["1"]["instructions"] == "Some instructions for this question."
+    assert questions["1"]["show_part_weights"] is False
+    assert len(questions["1"]["parts"]) == 1

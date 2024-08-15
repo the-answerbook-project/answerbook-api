@@ -4,12 +4,18 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 from starlette import status
 
-from api.dependencies import get_assessment_config, get_session, verify_user_is_marker
+from api.dependencies import (
+    get_assessment_config,
+    get_assessment_spec,
+    get_session,
+    verify_user_is_marker,
+)
 from api.models.answer import Answer
 from api.models.assessment import Assessment
 from api.models.mark import Mark, MarkHistory
 from api.models.student import Student
 from api.schemas.answer import AnswerRead
+from api.schemas.exam import AssessmentSpec, Question
 from api.schemas.mark import (
     MarkRead,
     MarkWrite,
@@ -134,3 +140,16 @@ def get_students(
     _=Depends(verify_user_is_marker),
 ):
     return config.candidates
+
+
+@marking_router.get(
+    "/questions",
+    response_model=dict[int, Question],
+    summary="Assessment questions",
+    description="Retrieve all the assessment questions.",
+)
+def get_questions(
+    assessment: AssessmentSpec = Depends(get_assessment_spec),
+    _=Depends(verify_user_is_marker),
+):
+    return assessment.questions

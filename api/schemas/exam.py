@@ -132,6 +132,11 @@ class AssessmentSpec(SQLModel):
         ext = parse_interval(self.extensions.get(username, "0"))
         return self.duration + ext
 
+    def computed_end_time_for_candidate(self, username):
+        duration = self.computed_duration_for_candidate(username)
+        duration_td = timedelta(minutes=duration)
+        return self.computed_beginning_for_candidate(username) + duration_td
+
 
 class AssessmentHeading(BaseSchema):
     course_code: str
