@@ -23,17 +23,3 @@ def get_summary(
     _=Depends(validate_token),
 ):
     return AssessmentHeading(**assessment.model_dump())
-
-
-@exam_router.get(
-    "/questions",
-    tags=["exam"],
-    response_model=dict[int, Question],
-    summary="Exam questions",
-    description="Retrieve all the exam questions.",
-)
-def get_questions(
-    assessment: AssessmentSpec = Depends(get_assessment_spec),
-    _=Depends(validate_token),
-):
-    return assessment.questions

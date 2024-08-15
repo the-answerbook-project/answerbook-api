@@ -1,5 +1,8 @@
-from fastapi import APIRouter, Depends
+from datetime import datetime, timezone
+
+from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
+from starlette import status
 
 from api.authentication.jwt_utils import JwtSubject
 from api.dependencies import (
@@ -9,7 +12,7 @@ from api.dependencies import (
 )
 from api.models.answer import Answer
 from api.schemas.answer import AnswerRead
-from api.schemas.exam import AssessmentHeading, AssessmentSpec
+from api.schemas.exam import AssessmentHeading, AssessmentSpec, Question
 
 candidates_router = APIRouter(
     prefix="/{assessment_code}/candidates/me", tags=["candidates"]
@@ -29,6 +32,26 @@ def get_user_specific_assessment_heading(
     assessment.begins = assessment.computed_beginning_for_candidate(sub.username)
     assessment.duration = assessment.computed_duration_for_candidate(sub.username)
     return AssessmentHeading(**assessment.model_dump())
+
+
+@candidates_router.get(
+    "/questions",
+    response_model=dict[int, Question],
+    summary="Assessment questions",
+    description="Retrieve all the assessment questions.",
+)
+def get_questions(
+    assessment: AssessmentSpec = Depends(get_assessment_spec),
+    subject: JwtSubject = Depends(validate_token),
+):
+    start_time = assessment.computed_beginning_for_candidate(subject.username)
+    if datetime.now(tz=timezone.utc) < start_time:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="The assessment has not started yet.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return assessment.questions
 
 
 @candidates_router.get(
