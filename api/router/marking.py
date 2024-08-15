@@ -4,9 +4,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 from starlette import status
 
-from api.dependencies import get_session, verify_user_is_marker
+from api.dependencies import get_assessment_config, get_session, verify_user_is_marker
 from api.models.answer import Answer
+from api.models.assessment import Assessment
 from api.models.mark import Mark, MarkHistory
+from api.models.student import Student
 from api.schemas.answer import AnswerRead
 from api.schemas.mark import (
     MarkRead,
@@ -22,7 +24,7 @@ marking_router = APIRouter(
 @marking_router.get(
     "/marks",
     response_model=list[MarkRead],
-    summary="Retrieve marks and feedback for exam questions",
+    summary="Retrieve marks and feedback for the assessment",
     description="Retrieve latest marks and feedback (with corresponding history)",
 )
 def get_marks(
@@ -45,9 +47,7 @@ def get_marks(
     "/marks",
     response_model=MarkRead,
     summary="Record section mark and/or feedback for student",
-    description="""
-Record a mark and/or feedback comment on a specific section of the given student's exam submission.
-""",
+    description="Record a mark and/or feedback comment on a specific section of the given student's submission.",
 )
 def post_mark_for_section(
     payload: MarkWrite,
@@ -121,3 +121,16 @@ def get_answers(
     if student_username:
         query = query.where(Answer.username == student_username)
     return session.exec(query).all()
+
+
+@marking_router.get(
+    "/students",
+    response_model=list[Student],
+    summary="Assessment students",
+    description="Retrieve all the students enrolled for the assessment",
+)
+def get_students(
+    config: Assessment = Depends(get_assessment_config),
+    _=Depends(verify_user_is_marker),
+):
+    return config.candidates

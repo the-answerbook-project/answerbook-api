@@ -1,14 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlmodel import Session, select
-from starlette import status
+from fastapi import APIRouter, Depends
 
-from api.authentication.jwt_utils import oauth2_scheme
 from api.dependencies import (
     get_assessment_spec,
-    get_session,
     validate_token,
 )
-from api.models.student import Student
 from api.schemas.exam import AssessmentHeading, AssessmentSpec, Question
 
 exam_router = APIRouter(prefix="/{assessment_code}", tags=["exam"])
@@ -42,21 +37,3 @@ def get_questions(
     _=Depends(validate_token),
 ):
     return assessment.questions
-
-
-@exam_router.get(
-    "/students",
-    tags=["exam"],
-    response_model=list[Student],
-    summary="Exam students",
-    description="Retrieve all the students enrolled for the exam",
-)
-def get_students(
-    assessment_code: str,
-    _=Depends(validate_token),
-    session: Session = Depends(get_session),
-):
-    query = select(Student).where(
-        Student.exam_id == assessment_code,
-    )
-    return session.exec(query).all()

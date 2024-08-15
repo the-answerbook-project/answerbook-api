@@ -10,7 +10,6 @@ from api.dependencies import (
 from api.models.answer import Answer
 from api.schemas.answer import AnswerRead
 from api.schemas.exam import AssessmentHeading, AssessmentSpec
-from api.utils import parse_interval
 
 candidates_router = APIRouter(
     prefix="/{assessment_code}/candidates/me", tags=["candidates"]

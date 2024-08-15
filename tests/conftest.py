@@ -16,6 +16,7 @@ from api.dependencies import (
     get_settings,
     validate_token,
 )
+from api.models.assessment import UserRole
 from api.settings import Settings
 
 ASSESSMENTS_DIR = Path(__file__).parent / "test_assessments"

@@ -22,7 +22,7 @@ tags_metadata = [
     },
     {
         "name": "marking",
-        "description": "Exam marks and answers",
+        "description": "Endpoints reserved for the marking process. Only accessible by markers.",
     },
     {
         "name": "proxy",

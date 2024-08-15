@@ -5,9 +5,17 @@ from freezegun import freeze_time
 
 from api.models.assessment import UserRole
 
+assessment_code = "y2023_12345_exam"
+
 mark_posting_ts = datetime(2024, 5, 1, 14, 22, tzinfo=timezone.utc)
 valid_section = {"question": 1, "part": 1, "section": 1}
-marker_token = {"role": UserRole.MARKER, "username": "adumble"}
+
+
+@pytest.fixture(name="marker_client")
+def marker_client_fixture(client_with_token):
+    return client_with_token(
+        role=UserRole.MARKER, username="adumble", assessment_code=assessment_code
+    )
 
 
 @pytest.mark.parametrize(
@@ -20,7 +28,7 @@ marker_token = {"role": UserRole.MARKER, "username": "adumble"}
 def test_GET_requests_on_marking_endopints_return_403_if_user_not_a_marker(
     url, client_with_token, assessment_factory
 ):
-    assessment_factory(code="y2023_12345_exam")
+    assessment_factory(code=assessment_code)
     res = client_with_token().get(url)
     assert res.status_code == 403
     assert res.json()["detail"] == "You don't have permissions to access this resource."
@@ -29,7 +37,7 @@ def test_GET_requests_on_marking_endopints_return_403_if_user_not_a_marker(
 def test_POST_requests_on_marking_endopints_return_403_if_user_not_a_marker(
     client_with_token, assessment_factory
 ):
-    assessment_factory(code="y2023_12345_exam")
+    assessment_factory(code=assessment_code)
     res = client_with_token().post(
         "/y2023_12345_exam/marks",
         json={**valid_section, "username": "hpotter", "feedback": None, "mark": None},
@@ -38,43 +46,43 @@ def test_POST_requests_on_marking_endopints_return_403_if_user_not_a_marker(
     assert res.json()["detail"] == "You don't have permissions to access this resource."
 
 
-def test_can_get_marks(client_with_token, assessment_factory):
+def test_can_get_marks(marker_client, assessment_factory):
     assessment = assessment_factory(
-        code="y2023_12345_exam",
+        code=assessment_code,
         with_students=[
             dict(username="hpotter", with_marks=2),
             dict(username="hgranger", with_marks=1),
         ],
     )
 
-    res = client_with_token(**marker_token).get(f"/{assessment.code}/marks")
+    res = marker_client.get(f"/{assessment.code}/marks")
     assert res.status_code == 200
     assert len(res.json()) == 3
 
 
-def test_can_filter_marks_by_student_username(client_with_token, assessment_factory):
+def test_can_filter_marks_by_student_username(marker_client, assessment_factory):
     assessment = assessment_factory(
-        code="y2023_12345_exam",
+        code=assessment_code,
         with_students=[
             dict(username="hpotter", with_marks=2),
             dict(username="hgranger", with_marks=1),
         ],
     )
 
-    res = client_with_token(**marker_token).get(
+    res = marker_client.get(
         f"/{assessment.code}/marks", params={"student_username": "hpotter"}
     )
     assert res.status_code == 200
     assert len(res.json()) == 2
 
 
-def test_response_mark_has_expected_fields(client_with_token, assessment_factory):
+def test_response_mark_has_expected_fields(marker_client, assessment_factory):
     assessment = assessment_factory(
-        code="y2023_12345_exam",
+        code=assessment_code,
         with_students=[dict(username="hpotter", with_marks=1)],
     )
 
-    res = client_with_token(**marker_token).get(f"/{assessment.code}/marks")
+    res = marker_client.get(f"/{assessment.code}/marks")
     assert res.status_code == 200
     assert len(res.json()) == 1
     [mark] = res.json()
@@ -88,33 +96,33 @@ def test_response_mark_has_expected_fields(client_with_token, assessment_factory
     assert "history" in mark
 
 
-def test_gets_empty_list_response_if_no_marks_exist_for_assessment(client_with_token):
-    res = client_with_token(**marker_token).get("/y2023_12345_exam/marks")
+def test_gets_empty_list_response_if_no_marks_exist_for_assessment(marker_client):
+    res = marker_client.get("/y2023_12345_exam/marks")
     assert res.status_code == 200
     assert len(res.json()) == 0
 
 
-def test_mark_include_mark_history(client_with_token, assessment_factory):
+def test_mark_include_mark_history(marker_client, assessment_factory):
     assessment = assessment_factory(
-        code="y2023_12345_exam",
+        code=assessment_code,
         with_students=[
             dict(username="hpotter", with_marks=[dict(question=1, with_history=5)])
         ],
     )
-    res = client_with_token(**marker_token).get(f"/{assessment.code}/marks")
+    res = marker_client.get(f"/{assessment.code}/marks")
     assert res.status_code == 200
     [mark] = res.json()
     assert len(mark["history"]) == 5
 
 
-def test_mark_history_has_expected_fields(client_with_token, assessment_factory):
+def test_mark_history_has_expected_fields(marker_client, assessment_factory):
     assessment = assessment_factory(
-        code="y2023_12345_exam",
+        code=assessment_code,
         with_students=[
             dict(username="hpotter", with_marks=[dict(question=1, with_history=1)])
         ],
     )
-    res = client_with_token(**marker_token).get(f"/{assessment.code}/marks")
+    res = marker_client.get(f"/{assessment.code}/marks")
     assert res.status_code == 200
     [mark] = res.json()
     [history_entry] = mark["history"]
@@ -124,13 +132,13 @@ def test_mark_history_has_expected_fields(client_with_token, assessment_factory)
 
 
 def test_cannot_post_to_marks_with_no_mark_and_no_feedback(
-    client_with_token, assessment_factory
+    marker_client, assessment_factory
 ):
     assessment = assessment_factory(
-        code="y2023_12345_exam",
+        code=assessment_code,
         with_students=[dict(username="hpotter")],
     )
-    res = client_with_token(**marker_token).post(
+    res = marker_client.post(
         f"/{assessment.code}/marks",
         json={**valid_section, "username": "hpotter", "feedback": None, "mark": None},
     )
@@ -143,10 +151,10 @@ def test_cannot_post_to_marks_with_no_mark_and_no_feedback(
 
 
 def test_posting_mark_without_feedback_updates_root_mark(
-    client_with_token, assessment_factory
+    marker_client, assessment_factory
 ):
     assessment = assessment_factory(
-        code="y2023_12345_exam",
+        code=assessment_code,
         with_students=[
             dict(username="hpotter", with_marks=[dict(**valid_section, with_history=1)])
         ],
@@ -155,7 +163,7 @@ def test_posting_mark_without_feedback_updates_root_mark(
     [mark] = student.marks
 
     with freeze_time(mark_posting_ts):
-        res = client_with_token(**marker_token).post(
+        res = marker_client.post(
             f"/{assessment.code}/marks",
             json={**valid_section, "username": "hpotter", "mark": 2.5},
         )
@@ -169,17 +177,17 @@ def test_posting_mark_without_feedback_updates_root_mark(
 
 
 def test_posting_feedback_without_mark_updates_root_feedback(
-    client_with_token, assessment_factory
+    marker_client, assessment_factory
 ):
     assessment = assessment_factory(
-        code="y2023_12345_exam",
+        code=assessment_code,
         with_students=[dict(username="hpotter", with_marks=[dict(**valid_section)])],
     )
     [student] = assessment.candidates
     [mark] = student.marks
 
     with freeze_time(mark_posting_ts):
-        res = client_with_token(**marker_token).post(
+        res = marker_client.post(
             f"/{assessment.code}/marks",
             json={**valid_section, "username": "hpotter", "feedback": "Some comment"},
         )
@@ -192,11 +200,11 @@ def test_posting_feedback_without_mark_updates_root_feedback(
     assert res_mark["timestamp"] == "2024-05-01T14:22:00+00:00"
 
 
-def test_posting_mark_and_feedback_for_section(client_with_token, assessment_factory):
+def test_posting_mark_and_feedback_for_section(marker_client, assessment_factory):
     assessment = assessment_factory(
-        code="y2023_12345_exam", with_students=[dict(username="hpotter")]
+        code=assessment_code, with_students=[dict(username="hpotter")]
     )
-    res = client_with_token(**marker_token).post(
+    res = marker_client.post(
         f"/{assessment.code}/marks",
         json={
             **valid_section,
@@ -214,16 +222,16 @@ def test_posting_mark_and_feedback_for_section(client_with_token, assessment_fac
 
 
 def test_posting_mark_without_feedback_adds_to_mark_history(
-    client_with_token, assessment_factory
+    marker_client, assessment_factory
 ):
     assessment = assessment_factory(
-        code="y2023_12345_exam",
+        code=assessment_code,
         with_students=[
             dict(username="hpotter", with_marks=[dict(**valid_section, with_history=1)])
         ],
     )
     with freeze_time(mark_posting_ts):
-        res = client_with_token(**marker_token).post(
+        res = marker_client.post(
             f"/{assessment.code}/marks",
             json={**valid_section, "username": "hpotter", "mark": 2.5},
         )
@@ -239,16 +247,16 @@ def test_posting_mark_without_feedback_adds_to_mark_history(
 
 
 def test_posting_feedback_without_mark_adds_to_mark_history(
-    client_with_token, assessment_factory
+    marker_client, assessment_factory
 ):
     assessment = assessment_factory(
-        code="y2023_12345_exam",
+        code=assessment_code,
         with_students=[
             dict(username="hpotter", with_marks=[dict(**valid_section, with_history=1)])
         ],
     )
     with freeze_time(mark_posting_ts):
-        res = client_with_token(**marker_token).post(
+        res = marker_client.post(
             f"/{assessment.code}/marks",
             json={**valid_section, "username": "hpotter", "feedback": "Some comment"},
         )
@@ -266,25 +274,25 @@ def test_posting_feedback_without_mark_adds_to_mark_history(
 # ANSWERS =================================
 
 
-def test_can_get_answers(client_with_token, assessment_factory):
+def test_can_get_answers(marker_client, assessment_factory):
     assessment = assessment_factory(
-        code="y2023_12345_exam",
+        code=assessment_code,
         with_students=[dict(username="hpotter", with_answers=5)],
     )
-    res = client_with_token(**marker_token).get(f"/{assessment.code}/answers")
+    res = marker_client.get(f"/{assessment.code}/answers")
     assert res.status_code == 200
     assert len(res.json()) == 5
 
 
-def test_can_filter_answers_by_student(client_with_token, assessment_factory):
+def test_can_filter_answers_by_student(marker_client, assessment_factory):
     assessment = assessment_factory(
-        code="y2023_12345_exam",
+        code=assessment_code,
         with_students=[
             dict(username="hpotter", with_answers=2),
             dict(username="hgranger", with_answers=5),
         ],
     )
-    res = client_with_token(**marker_token).get(
+    res = marker_client.get(
         f"/{assessment.code}/answers", params={"student_username": "hpotter"}
     )
     assert res.status_code == 200
@@ -292,21 +300,21 @@ def test_can_filter_answers_by_student(client_with_token, assessment_factory):
 
 
 def test_gets_empty_list_response_if_no_answers_exist_for_assessment(
-    client_with_token, assessment_factory
+    marker_client, assessment_factory
 ):
-    assessment = assessment_factory(code="y2023_12345_exam")
-    res = client_with_token(**marker_token).get(f"/{assessment.code}/answers")
+    assessment = assessment_factory(code=assessment_code)
+    res = marker_client.get(f"/{assessment.code}/answers")
     assert res.status_code == 200
     assert len(res.json()) == 0
 
 
-def test_response_answer_has_expected_fields(client_with_token, assessment_factory):
+def test_response_answer_has_expected_fields(marker_client, assessment_factory):
     assessment = assessment_factory(
-        code="y2023_12345_exam",
+        code=assessment_code,
         with_students=[dict(username="hpotter", with_answers=1)],
     )
 
-    res = client_with_token(**marker_token).get(f"/{assessment.code}/answers")
+    res = marker_client.get(f"/{assessment.code}/answers")
     assert res.status_code == 200
     [answer] = res.json()
     assert "username" in answer
@@ -315,3 +323,23 @@ def test_response_answer_has_expected_fields(client_with_token, assessment_facto
     assert "section" in answer
     assert "task" in answer
     assert "answer" in answer
+
+
+def test_can_get_enrolled_students_for_exam(marker_client, assessment_factory):
+    assessment = assessment_factory(code="simple", with_students=3)
+    res = marker_client.get(f"/{assessment.code}/students")
+    assert res.status_code == 200
+    assert len(res.json()) == 3
+
+
+def test_student_has_expected_fields(marker_client, assessment_factory):
+    assessment = assessment_factory(code="simple", with_students=1)
+    [student_] = assessment.candidates
+    res = marker_client.get(f"/{assessment.code}/students")
+    assert res.status_code == 200
+    [student] = res.json()
+    assert student["cid"] == student_.cid
+    assert student["firstname"] == student_.firstname
+    assert student["lastname"] == student_.lastname
+    assert student["username"] == student_.username
+    assert student["degree_code"] == student_.degree_code
