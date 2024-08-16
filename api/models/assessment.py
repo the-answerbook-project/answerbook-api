@@ -45,4 +45,6 @@ class Assessment(SQLModel, table=True):
     def get_role(self, username: str) -> UserRole | None:
         if username in set(map(attrgetter("username"), self.candidates)):
             return UserRole.CANDIDATE
+        if username in set(map(attrgetter("username"), self.markers)):
+            return UserRole.MARKER
         return None
