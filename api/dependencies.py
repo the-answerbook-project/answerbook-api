@@ -6,7 +6,7 @@ from fastapi import Depends, HTTPException
 from jwt import InvalidTokenError
 from sqlalchemy import exists
 from sqlalchemy.exc import SQLAlchemyError
-from sqlmodel import Session, and_, or_, select
+from sqlmodel import Session, select
 from starlette import status
 
 from api.authentication.jwt_utils import JWT_ALGO, JwtSubject, oauth2_scheme
@@ -80,6 +80,7 @@ def get_assessment_config(
 def validate_token(
     token=Depends(oauth2_scheme),
     session: Session = Depends(get_session),
+    settings: Settings = Depends(get_settings),
     assessment=Depends(get_assessment_config),
 ) -> JwtSubject:
     """
@@ -94,7 +95,7 @@ def validate_token(
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token, get_settings().secret_key, algorithms=[JWT_ALGO])
+        payload = jwt.decode(token, settings.secret_key, algorithms=[JWT_ALGO])
         raw_subject = payload.get("sub")
         if raw_subject is None:
             raise credentials_exception
