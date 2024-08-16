@@ -4,7 +4,6 @@ import factory
 from factory import Faker
 from factory.alchemy import SQLAlchemyModelFactory
 
-from api.dependencies import get_session
 from api.factories.answer import AnswerFactory
 from api.factories.mark import MarkFactory
 from api.models.student import Student
@@ -13,7 +12,6 @@ from api.models.student import Student
 class StudentFactory(SQLAlchemyModelFactory):
     class Meta:
         model = Student
-        sqlalchemy_session = get_session()
         sqlalchemy_session_persistence = "commit"
 
     exam_id: str = Faker("pystr_format", string_format="y####_#####_exam")

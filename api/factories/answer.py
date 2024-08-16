@@ -4,14 +4,12 @@ from datetime import datetime
 from factory import Faker
 from factory.alchemy import SQLAlchemyModelFactory
 
-from api.dependencies import get_session
 from api.models.answer import Answer
 
 
 class AnswerFactory(SQLAlchemyModelFactory):
     class Meta:
         model = Answer
-        sqlalchemy_session = get_session()
         sqlalchemy_session_persistence = "commit"
 
     exam_id: str = Faker("pystr_format", string_format="y####_#####_exam")

@@ -1,5 +1,5 @@
 from datetime import timedelta
-from unittest.mock import MagicMock, Mock
+from unittest.mock import Mock
 
 import jwt
 import pytest
@@ -7,6 +7,7 @@ from fastapi import HTTPException
 from fastapi.testclient import TestClient
 from sqlmodel import select
 
+from api import Settings
 from api.authentication.internal_authentication import pwd_context
 from api.authentication.jwt_utils import JwtSubject
 from api.authentication.ldap_authentication import LdapAuthenticator
@@ -167,14 +168,14 @@ def test_calculation_of_token_expiration(duration, extensions, expected_minutes)
 
 def test_token_validation_fails_with_401_if_token_is_invalid():
     with pytest.raises(HTTPException) as http_exception:
-        validate_token()
+        validate_token(settings=Settings())
     assert http_exception.value.status_code == 401
 
 
 def test_token_validation_fails_with_401_if_token_subject_is_none(monkeypatch):
     monkeypatch.setattr(jwt, "decode", lambda *args, **kwargs: {"sub": None})
     with pytest.raises(HTTPException) as http_exception:
-        validate_token()
+        validate_token(settings=Settings())
     assert http_exception.value.status_code == 401
 
 
@@ -186,7 +187,7 @@ def test_token_validation_fails_with_401_if_assessment_code_mismatches(monkeypat
     }
     monkeypatch.setattr(jwt, "decode", lambda *args, **kwargs: {"sub": subject})
     with pytest.raises(HTTPException) as http_exception:
-        validate_token(assessment=Mock(code="456"))
+        validate_token(settings=Settings(), assessment=Mock(code="456"))
     assert http_exception.value.status_code == 401
 
 
@@ -201,7 +202,7 @@ def test_token_validation_fails_with_401_if_student_username_doesnt_match(
     }
     monkeypatch.setattr(jwt, "decode", lambda *args, **kwargs: {"sub": subject})
     with pytest.raises(HTTPException) as http_exception:
-        validate_token(session=session, assessment=assessment)
+        validate_token(settings=Settings(), session=session, assessment=assessment)
     assert http_exception.value.status_code == 401
 
 
@@ -215,5 +216,7 @@ def test_successful_token_validation_returns_token_payload(
         "role": UserRole.CANDIDATE,
     }
     monkeypatch.setattr(jwt, "decode", lambda *args, **kwargs: {"sub": subject})
-    payload = validate_token(session=session, assessment=assessment)
+    payload = validate_token(
+        settings=Settings(), session=session, assessment=assessment
+    )
     assert payload == JwtSubject(**subject)

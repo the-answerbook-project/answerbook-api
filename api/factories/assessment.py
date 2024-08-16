@@ -4,7 +4,6 @@ import factory
 from factory import Faker
 from factory.alchemy import SQLAlchemyModelFactory
 
-from api.dependencies import get_session
 from api.factories.marker import MarkerFactory
 from api.factories.student import StudentFactory
 from api.models.assessment import Assessment, AuthenticationMode
@@ -14,7 +13,6 @@ from api.models.internal_credentials import InternalCredentials
 class InternalCredentialsFactory(SQLAlchemyModelFactory):
     class Meta:
         model = InternalCredentials
-        sqlalchemy_session = get_session()
         sqlalchemy_session_persistence = "commit"
 
     username: str = Faker(
@@ -26,7 +24,6 @@ class InternalCredentialsFactory(SQLAlchemyModelFactory):
 class AssessmentFactory(SQLAlchemyModelFactory):
     class Meta:
         model = Assessment
-        sqlalchemy_session = get_session()
         sqlalchemy_session_persistence = "commit"
 
     code: str = Faker("pystr_format", string_format="y####_#####_exam")

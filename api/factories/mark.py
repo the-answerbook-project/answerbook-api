@@ -5,14 +5,12 @@ import factory
 from factory import Faker
 from factory.alchemy import SQLAlchemyModelFactory
 
-from api.dependencies import get_session
 from api.models.mark import Mark, MarkHistory
 
 
 class MarkFactory(SQLAlchemyModelFactory):
     class Meta:
         model = Mark
-        sqlalchemy_session = get_session()
         sqlalchemy_session_persistence = "commit"
 
     exam_id: str = Faker("pystr_format", string_format="y####_#####_exam")
@@ -47,7 +45,6 @@ class MarkFactory(SQLAlchemyModelFactory):
 class MarkHistoryFactory(SQLAlchemyModelFactory):
     class Meta:
         model = MarkHistory
-        sqlalchemy_session = get_session()
         sqlalchemy_session_persistence = "commit"
 
     mark: int = Faker("pyint")
