@@ -191,7 +191,7 @@ def test_token_validation_fails_with_401_if_assessment_code_mismatches(monkeypat
     assert http_exception.value.status_code == 401
 
 
-def test_token_validation_fails_with_401_if_student_username_doesnt_match(
+def test_token_validation_fails_with_401_if_candidate_not_enrolled_to_assessment(
     monkeypatch, assessment_factory, session
 ):
     assessment = assessment_factory()
