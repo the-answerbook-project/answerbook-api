@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlmodel import SQLModel
 
 
@@ -8,6 +10,7 @@ class AnswerRead(SQLModel):
     section: int
     task: int
     answer: str
+    timestamp: datetime
 
 
 class AnswerWrite(SQLModel):

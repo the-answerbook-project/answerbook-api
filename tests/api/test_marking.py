@@ -326,6 +326,7 @@ def test_response_answer_has_expected_fields(marker_client, assessment_factory):
     assert "section" in answer
     assert "task" in answer
     assert "answer" in answer
+    assert "timestamp" in answer
 
 
 def test_can_get_enrolled_students_for_exam(marker_client, assessment_factory):
