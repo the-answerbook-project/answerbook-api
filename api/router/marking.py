@@ -57,7 +57,7 @@ def get_marks(
 )
 def post_mark_for_section(
     payload: MarkWrite,
-    assessment_code: str,
+    assessment: Assessment = Depends(get_assessment_config),
     session: Session = Depends(get_session),
     marker=Depends(verify_user_is_marker),
 ):
@@ -68,7 +68,7 @@ def post_mark_for_section(
         )
 
     query = select(Mark).where(
-        Mark.exam_id == assessment_code,
+        Mark.assessment_id == assessment.id,
         Mark.username == payload.username,
         Mark.question == payload.question,
         Mark.part == payload.part,
@@ -84,7 +84,8 @@ def post_mark_for_section(
         mark.marker = marker
     else:
         mark = Mark(
-            exam_id=assessment_code,
+            exam_id=assessment.code,
+            assessment_id=assessment.id,
             question=payload.question,
             part=payload.part,
             section=payload.section,
