@@ -1,8 +1,7 @@
 from datetime import datetime
 from ipaddress import IPv4Address
 
-import sqlmodel
-from sqlalchemy import Column
+from sqlalchemy import Column, DateTime, func
 from sqlalchemy.dialects.postgresql import INET
 from sqlmodel import Field, SQLModel
 
@@ -17,8 +16,10 @@ class Answer(SQLModel, table=True):
     task: int = Field(default=None)
     answer: str = Field(nullable=True)
     timestamp: datetime = Field(
-        sa_column=sqlmodel.Column(
-            sqlmodel.DateTime(timezone=False),
+        sa_column=Column(
+            DateTime,
+            server_default=func.timezone("UTC", func.current_timestamp()),
+            nullable=False,
         )
     )
     ip: IPv4Address = Field(sa_column=Column(INET))

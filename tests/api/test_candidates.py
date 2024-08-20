@@ -6,6 +6,13 @@ from freezegun import freeze_time
 from api.models.assessment import UserRole
 
 assessment_code = "simple"
+valid_answer = {
+    "question": 1,
+    "part": 1,
+    "section": 1,
+    "task": 1,
+    "answer": "some answer",
+}
 
 
 @pytest.fixture(name="candidate_client")
@@ -106,3 +113,51 @@ def test_questions_for_assessment_have_expected_fields(candidate_client):
     assert questions["1"]["instructions"] == "Some instructions for this question."
     assert questions["1"]["show_part_weights"] is False
     assert len(questions["1"]["parts"]) == 1
+
+
+def test_posting_answers_gives_404_if_assessment_does_not_exist(candidate_client):
+    res = candidate_client.post(
+        "/not-existing/candidates/me/answers", json=valid_answer
+    )
+    assert res.status_code == 404
+    assert res.json()["detail"] == "Assessment not found."
+
+
+def test_candidate_cannot_post_answer_before_start(
+    candidate_client, assessment_factory
+):
+    assessment = assessment_factory(code=assessment_code)
+    with freeze_time(datetime(2019, 1, 1, 7, 59, tzinfo=timezone.utc)):
+        res = candidate_client.post(
+            f"/{assessment.code}/candidates/me/answers", json=valid_answer
+        )
+    assert res.status_code == 403
+    assert res.json()["detail"] == "The assessment has not started yet."
+
+
+def test_candidate_cannot_post_answer_after_end(candidate_client, assessment_factory):
+    assessment = assessment_factory(code=assessment_code)
+    with freeze_time(datetime(2019, 1, 1, 10, 26, tzinfo=timezone.utc)):
+        res = candidate_client.post(
+            f"/{assessment.code}/candidates/me/answers", json=valid_answer
+        )
+    assert res.status_code == 403
+    assert res.json()["detail"] == "The assessment is over."
+
+
+def test_new_answer_response_has_expected_fields(candidate_client, assessment_factory):
+    assessment = assessment_factory(
+        code=assessment_code, with_students=[dict(username="hpotter")]
+    )
+    with freeze_time(datetime(2019, 1, 1, 8, 30, tzinfo=timezone.utc)):
+        res = candidate_client.post(
+            f"/{assessment.code}/candidates/me/answers", json=valid_answer
+        )
+    assert res.status_code == 200
+    answer = res.json()
+    assert "question" in answer
+    assert "part" in answer
+    assert "section" in answer
+    assert "task" in answer
+    assert "answer" in answer
+    assert "timestamp" in answer

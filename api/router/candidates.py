@@ -13,7 +13,7 @@ from api.dependencies import (
 )
 from api.models.answer import Answer
 from api.models.assessment import Assessment
-from api.schemas.answer import AnswerRead
+from api.schemas.answer import AnswerRead, AnswerWrite
 from api.schemas.exam import AssessmentHeading, AssessmentSpec, Question
 
 candidates_router = APIRouter(
@@ -27,7 +27,7 @@ candidates_router = APIRouter(
     summary="Assessment heading",
     description="Retrieve the assessment heading with user-specific start-time and end-time.",
 )
-def get_user_specific_assessment_heading(
+def get_assessment_heading(
     assessment: AssessmentSpec = Depends(get_assessment_spec),
     sub: JwtSubject = Depends(validate_token),
 ):
@@ -62,7 +62,7 @@ def get_questions(
     summary="User's answers to assessments' tasks",
     description="Retrieve all the user's answers to the assessment.",
 )
-def get_user_answers(
+def get_answers(
     assessment: Assessment = Depends(get_assessment_config),
     session: Session = Depends(get_session),
     sub: JwtSubject = Depends(validate_token),
@@ -73,3 +73,40 @@ def get_user_answers(
         .order_by(Answer.question, Answer.part, Answer.section, Answer.task)  # type: ignore
     )
     return session.exec(query).all()
+
+
+@candidates_router.post(
+    "/answers",
+    response_model=AnswerRead,
+    summary="Store candidate's answer",
+    description="Store the candidate's answer to a specific assessment's task.",
+)
+def post_answer(
+    answer: AnswerWrite,
+    assessment_spec: AssessmentSpec = Depends(get_assessment_spec),
+    assessment_config: Assessment = Depends(get_assessment_config),
+    session: Session = Depends(get_session),
+    subject: JwtSubject = Depends(validate_token),
+):
+    start_time = assessment_spec.computed_beginning_for_candidate(subject.username)
+    if datetime.now(tz=timezone.utc) < start_time:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="The assessment has not started yet.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    end_time = assessment_spec.computed_end_time_for_candidate(subject.username)
+    if datetime.now(tz=timezone.utc) > end_time:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="The assessment is over.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    new_answer = Answer(
+        assessment_id=assessment_config.id,
+        username=subject.username,
+        **answer.model_dump(),
+    )
+    session.add(new_answer)
+    session.commit()
+    return new_answer
