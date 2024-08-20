@@ -13,7 +13,6 @@ class MarkFactory(SQLAlchemyModelFactory):
         model = Mark
         sqlalchemy_session_persistence = "commit"
 
-    exam_id: str = Faker("pystr_format", string_format="y####_#####_exam")
     username: str = Faker(
         "pystr_format", string_format="????##", letters=string.ascii_lowercase
     )

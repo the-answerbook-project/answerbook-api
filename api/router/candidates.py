@@ -6,11 +6,13 @@ from starlette import status
 
 from api.authentication.jwt_utils import JwtSubject
 from api.dependencies import (
+    get_assessment_config,
     get_assessment_spec,
     get_session,
     validate_token,
 )
 from api.models.answer import Answer
+from api.models.assessment import Assessment
 from api.schemas.answer import AnswerRead
 from api.schemas.exam import AssessmentHeading, AssessmentSpec, Question
 
@@ -61,13 +63,13 @@ def get_questions(
     description="Retrieve all the user's answers to the assessment.",
 )
 def get_user_answers(
-    assessment_code: str,
+    assessment: Assessment = Depends(get_assessment_config),
     session: Session = Depends(get_session),
     sub: JwtSubject = Depends(validate_token),
 ):
     query = (
         select(Answer)
-        .where(Answer.exam_id == assessment_code, Answer.username == sub.username)
+        .where(Answer.assessment_id == assessment.id, Answer.username == sub.username)
         .order_by(Answer.question, Answer.part, Answer.section, Answer.task)  # type: ignore
     )
     return session.exec(query).all()

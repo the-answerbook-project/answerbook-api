@@ -14,7 +14,6 @@ class StudentFactory(SQLAlchemyModelFactory):
         model = Student
         sqlalchemy_session_persistence = "commit"
 
-    exam_id: str = Faker("pystr_format", string_format="y####_#####_exam")
     username: str = Faker(
         "pystr_format", string_format="????##", letters=string.ascii_lowercase
     )
@@ -30,14 +29,12 @@ class StudentFactory(SQLAlchemyModelFactory):
             if isinstance(answers, int):
                 for _ in range(answers):
                     AnswerFactory(
-                        exam_id=self.exam_id,
                         assessment_id=self.assessment_id,
                         username=self.username,
                     )
             if isinstance(answers, list):
                 for a in answers:
                     AnswerFactory(
-                        exam_id=self.exam_id,
                         assessment_id=self.assessment_id,
                         username=self.username,
                         **a,
@@ -49,14 +46,12 @@ class StudentFactory(SQLAlchemyModelFactory):
             if isinstance(marks, int):
                 for _ in range(marks):
                     MarkFactory(
-                        exam_id=self.exam_id,
                         assessment_id=self.assessment_id,
                         username=self.username,
                     )
             if isinstance(marks, list):
                 for m in marks:
                     MarkFactory(
-                        exam_id=self.exam_id,
                         assessment_id=self.assessment_id,
                         username=self.username,
                         **m,

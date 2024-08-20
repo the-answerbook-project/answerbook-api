@@ -96,8 +96,11 @@ def test_response_mark_has_expected_fields(marker_client, assessment_factory):
     assert "history" in mark
 
 
-def test_gets_empty_list_response_if_no_marks_exist_for_assessment(marker_client):
-    res = marker_client.get("/y2023_12345_exam/marks")
+def test_gets_empty_list_response_if_no_marks_exist_for_assessment(
+    marker_client, assessment_factory
+):
+    assessment = assessment_factory()
+    res = marker_client.get(f"/{assessment.code}/marks")
     assert res.status_code == 200
     assert len(res.json()) == 0
 

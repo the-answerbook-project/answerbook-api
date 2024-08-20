@@ -34,14 +34,14 @@ marking_router = APIRouter(
     description="Retrieve latest marks and feedback (with corresponding history)",
 )
 def get_marks(
-    assessment_code: str,
+    assessment: Assessment = Depends(get_assessment_config),
     student_username: str | None = None,
     _=Depends(verify_user_is_marker),
     session: Session = Depends(get_session),
 ):
     query = (
         select(Mark)
-        .where(Mark.exam_id == assessment_code)
+        .where(Mark.assessment_id == assessment.id)
         .order_by(Mark.question, Mark.part, Mark.section)  # type: ignore
     )
     if student_username:
@@ -84,7 +84,6 @@ def post_mark_for_section(
         mark.marker = marker
     else:
         mark = Mark(
-            exam_id=assessment.code,
             assessment_id=assessment.id,
             question=payload.question,
             part=payload.part,
@@ -115,14 +114,14 @@ def post_mark_for_section(
     description="Retrieve the latest answers for all questions in exam",
 )
 def get_answers(
-    assessment_code: str,
+    assessment: Assessment = Depends(get_assessment_config),
     student_username: str | None = None,
     session: Session = Depends(get_session),
     _=Depends(verify_user_is_marker),
 ):
     query = (
         select(Answer)
-        .where(Answer.exam_id == assessment_code)
+        .where(Answer.assessment_id == assessment.id)
         .order_by(Answer.question, Answer.part, Answer.section, Answer.task)  # type: ignore
     )
     if student_username:

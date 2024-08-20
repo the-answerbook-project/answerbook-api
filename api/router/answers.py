@@ -25,10 +25,17 @@ def get_qpsa(
     session: Session = Depends(get_session),
     assessment_id: str = Depends(get_assessment_id),
 ):
+    assessment_query = select(Assessment).where(Assessment.code == assessment_id)
+    assessment = session.exec(assessment_query).first()
+    if assessment is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Assessment not found.",
+        )
     query = (
         select(Answer)
         .where(
-            Answer.exam_id == assessment_id,
+            Answer.assessment_id == assessment.id,
             Answer.question == question_number,
             Answer.part == part_number,
             Answer.section == section_number,
@@ -53,11 +60,18 @@ def get_answer_to_question(
     session: Session = Depends(get_session),
     assessment_id: str = Depends(get_assessment_id),
 ):
+    assessment_query = select(Assessment).where(Assessment.code == assessment_id)
+    assessment = session.exec(assessment_query).first()
+    if assessment is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Assessment not found.",
+        )
     query = (
         select(Answer)
         .where(
             Answer.question == question_number,
-            Answer.exam_id == assessment_id,
+            Answer.assessment_id == assessment.id,
             Answer.username == username,
         )
         .order_by(Answer.part, Answer.section, Answer.task)  # type: ignore
@@ -67,7 +81,6 @@ def get_answer_to_question(
 
 @answers_router.post(
     "/question/{question_number}",
-    # response_model=AnswerRead,
     summary="Submit user answer to question",
     description="""
 Submit the user answer to the given question's task.
@@ -92,16 +105,12 @@ def submit_answer_to_question(
         Answer(
             **answer.model_dump(),
             assessment_id=assessment.id,
-            exam_id=assessment_id,
             username=username,
         )
         for answer in answers
     ]
 
     for answer in answer_objects:
-        # Check if there based on the exam_id, username, question, part, section, task
-        # Update if so
-        # Otherwise, insert
         query = select(Answer).where(
             Answer.assessment_id == assessment.id,
             Answer.username == username,

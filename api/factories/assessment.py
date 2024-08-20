@@ -36,13 +36,10 @@ class AssessmentFactory(SQLAlchemyModelFactory):
         if create and students:
             if isinstance(students, int):
                 for _ in range(students):
-                    StudentFactory(
-                        assessment_id=self.id,
-                        exam_id=self.code,
-                    )
+                    StudentFactory(assessment_id=self.id)
             if isinstance(students, list):
                 for s in students:
-                    StudentFactory(assessment_id=self.id, exam_id=self.code, **s)
+                    StudentFactory(assessment_id=self.id, **s)
 
     @factory.post_generation
     def with_markers(

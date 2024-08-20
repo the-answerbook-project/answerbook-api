@@ -6,7 +6,6 @@ from sqlmodel import Field, Relationship, SQLModel
 
 class Mark(SQLModel, table=True):
     id: int = Field(primary_key=True)
-    exam_id: str = Field(default=None, index=True)
     assessment_id: int = Field(foreign_key="assessment.id", index=True)
     username: str = Field(nullable=False, foreign_key="student.username")
     question: int = Field(default=None)

@@ -56,8 +56,11 @@ def test_response_answer_has_expected_fields(client, assessment_factory):
     assert answer_["answer"] == answer.answer
 
 
-def test_gets_empty_list_response_if_no_answers_exist_for_assessment(client):
-    res = client("y2023_12345_exam").get(f"{PREFIX}/question/1")
+def test_gets_empty_list_response_if_no_answers_exist_for_assessment(
+    client, assessment_factory
+):
+    assessment = assessment_factory()
+    res = client(assessment.code).get(f"{PREFIX}/question/1")
     assert res.status_code == 200
     assert len(res.json()) == 0
 
