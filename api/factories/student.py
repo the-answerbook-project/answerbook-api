@@ -29,17 +29,35 @@ class StudentFactory(SQLAlchemyModelFactory):
         if create and answers:
             if isinstance(answers, int):
                 for _ in range(answers):
-                    AnswerFactory(exam_id=self.exam_id, username=self.username)
+                    AnswerFactory(
+                        exam_id=self.exam_id,
+                        assessment_id=self.assessment_id,
+                        username=self.username,
+                    )
             if isinstance(answers, list):
                 for a in answers:
-                    AnswerFactory(exam_id=self.exam_id, username=self.username, **a)
+                    AnswerFactory(
+                        exam_id=self.exam_id,
+                        assessment_id=self.assessment_id,
+                        username=self.username,
+                        **a,
+                    )
 
     @factory.post_generation
     def with_marks(self, create: bool, marks: int | list[dict], **kwargs) -> None:
         if create and marks:
             if isinstance(marks, int):
                 for _ in range(marks):
-                    MarkFactory(exam_id=self.exam_id, username=self.username)
+                    MarkFactory(
+                        exam_id=self.exam_id,
+                        assessment_id=self.assessment_id,
+                        username=self.username,
+                    )
             if isinstance(marks, list):
                 for m in marks:
-                    MarkFactory(exam_id=self.exam_id, username=self.username, **m)
+                    MarkFactory(
+                        exam_id=self.exam_id,
+                        assessment_id=self.assessment_id,
+                        username=self.username,
+                        **m,
+                    )

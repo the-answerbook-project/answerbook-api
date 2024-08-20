@@ -1,8 +1,10 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
+from starlette import status
 
 from api.dependencies import get_assessment_id, get_session
 from api.models.answer import Answer
+from api.models.assessment import Assessment
 from api.schemas.answer import AnswerRead, AnswerWrite
 
 answers_router = APIRouter(prefix="/answers/{username}", tags=["exam"])
@@ -78,8 +80,21 @@ def submit_answer_to_question(
     session: Session = Depends(get_session),
     assessment_id: str = Depends(get_assessment_id),
 ):
+    assessment_query = select(Assessment).where(Assessment.code == assessment_id)
+    assessment = session.exec(assessment_query).first()
+    if assessment is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Assessment not found.",
+        )
+
     answer_objects: list[Answer] = [
-        Answer(**answer.dict(), exam_id=assessment_id, username=username)
+        Answer(
+            **answer.model_dump(),
+            assessment_id=assessment.id,
+            exam_id=assessment_id,
+            username=username,
+        )
         for answer in answers
     ]
 
@@ -88,7 +103,7 @@ def submit_answer_to_question(
         # Update if so
         # Otherwise, insert
         query = select(Answer).where(
-            Answer.exam_id == assessment_id,
+            Answer.assessment_id == assessment.id,
             Answer.username == username,
             Answer.question == question_number,
             Answer.part == answer.part,
