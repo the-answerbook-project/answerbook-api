@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
@@ -19,6 +19,8 @@ from api.schemas.exam import AssessmentHeading, AssessmentSpec, Question
 candidates_router = APIRouter(
     prefix="/{assessment_code}/candidates/me", tags=["candidates"]
 )
+
+GRACE_PERIOD_IN_SECONDS_PAST_DEADLINE = 30
 
 
 @candidates_router.get(
@@ -96,6 +98,7 @@ def post_answer(
             headers={"WWW-Authenticate": "Bearer"},
         )
     end_time = assessment_spec.computed_end_time_for_candidate(subject.username)
+    end_time += timedelta(seconds=GRACE_PERIOD_IN_SECONDS_PAST_DEADLINE)
     if datetime.now(tz=timezone.utc) > end_time:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,

@@ -145,6 +145,22 @@ def test_candidate_cannot_post_answer_after_end(candidate_client, assessment_fac
     assert res.json()["detail"] == "The assessment is over."
 
 
+@pytest.mark.parametrize("seconds_past_deadline", [10, 15, 20, 25, 30])
+def test_candidate_can_post_answers_within_grace_period(
+    candidate_client, assessment_factory, seconds_past_deadline
+):
+    assessment = assessment_factory(
+        code=assessment_code, with_students=[dict(username="hpotter")]
+    )
+    with freeze_time(
+        datetime(2019, 1, 1, 10, 25, seconds_past_deadline, tzinfo=timezone.utc)
+    ):
+        res = candidate_client.post(
+            f"/{assessment.code}/candidates/me/answers", json=valid_answer
+        )
+    assert res.status_code == 200
+
+
 def test_new_answer_response_has_expected_fields(candidate_client, assessment_factory):
     assessment = assessment_factory(
         code=assessment_code, with_students=[dict(username="hpotter")]
