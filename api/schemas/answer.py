@@ -4,6 +4,7 @@ from sqlmodel import SQLModel
 
 
 class AnswerRead(SQLModel):
+    id: int
     username: str
     question: int
     part: int

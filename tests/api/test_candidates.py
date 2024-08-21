@@ -2,7 +2,10 @@ from datetime import datetime, timezone
 
 import pytest
 from freezegun import freeze_time
+from sqlalchemy import func
+from sqlmodel import select
 
+from api.models.answer import AnswerHistory
 from api.models.assessment import UserRole
 
 assessment_code = "simple"
@@ -171,9 +174,34 @@ def test_new_answer_response_has_expected_fields(candidate_client, assessment_fa
         )
     assert res.status_code == 200
     answer = res.json()
+    assert "id" in answer
+    assert "username" in answer
     assert "question" in answer
     assert "part" in answer
     assert "section" in answer
     assert "task" in answer
     assert "answer" in answer
     assert "timestamp" in answer
+
+
+def test_new_answer_adds_to_answer_history(
+    candidate_client, assessment_factory, session
+):
+    assessment = assessment_factory(
+        code=assessment_code,
+        with_students=[
+            dict(
+                username="hpotter", with_answers=[dict(**valid_answer, with_history=1)]
+            )
+        ],
+    )
+    with freeze_time(datetime(2019, 1, 1, 8, 30, tzinfo=timezone.utc)):
+        res = candidate_client.post(
+            f"/{assessment.code}/candidates/me/answers", json=valid_answer
+        )
+    assert res.status_code == 200
+    answer_id = res.json()["id"]
+    query = select(func.count(AnswerHistory.id)).where(
+        AnswerHistory.answer_id == answer_id
+    )
+    assert session.exec(query).one() == 2

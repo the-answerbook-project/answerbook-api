@@ -11,7 +11,7 @@ from api.dependencies import (
     get_session,
     validate_token,
 )
-from api.models.answer import Answer
+from api.models.answer import Answer, AnswerHistory
 from api.models.assessment import Assessment
 from api.schemas.answer import AnswerRead, AnswerWrite
 from api.schemas.exam import AssessmentHeading, AssessmentSpec, Question
@@ -84,7 +84,7 @@ def get_answers(
     description="Store the candidate's answer to a specific assessment's task.",
 )
 def post_answer(
-    answer: AnswerWrite,
+    payload: AnswerWrite,
     assessment_spec: AssessmentSpec = Depends(get_assessment_spec),
     assessment_config: Assessment = Depends(get_assessment_config),
     session: Session = Depends(get_session),
@@ -105,11 +105,28 @@ def post_answer(
             detail="The assessment is over.",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    new_answer = Answer(
-        assessment_id=assessment_config.id,
-        username=subject.username,
-        **answer.model_dump(),
+    timestamp = datetime.now(timezone.utc).replace(tzinfo=None)
+    query = select(Answer).where(
+        Answer.assessment_id == assessment_config.id,
+        Answer.username == subject.username,
+        Answer.question == payload.question,
+        Answer.part == payload.part,
+        Answer.section == payload.section,
+        Answer.task == payload.task,
     )
-    session.add(new_answer)
+    answer = session.exec(query).first()
+    if answer:
+        answer.answer = payload.answer
+        answer.timestamp = timestamp
+
+    else:
+        answer = Answer(
+            assessment_id=assessment_config.id,
+            username=subject.username,
+            timestamp=timestamp,
+            **payload.model_dump(),
+        )
+        session.add(answer)
+    session.add(AnswerHistory.from_answer(answer))
     session.commit()
-    return new_answer
+    return answer
