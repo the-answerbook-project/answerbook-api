@@ -30,12 +30,6 @@ class MarkHistory(SQLModel, table=True):
     mark_id: int = Field(foreign_key="mark.id")
     mark: float = Field(nullable=True)
     feedback: str = Field(nullable=True)
-    timestamp: datetime = Field(
-        sa_column=Column(
-            DateTime,
-            server_default=func.timezone("UTC", func.current_timestamp()),
-            nullable=False,
-        )
-    )
+    timestamp: datetime = Field(sa_column=Column(DateTime, nullable=False))
     marker: str = Field(nullable=False)
     current_mark: Mark = Relationship(back_populates="history")

@@ -66,7 +66,7 @@ def post_mark_for_section(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="At least one between 'mark' and 'feedback' is required.",
         )
-
+    timestamp = datetime.now(timezone.utc).replace(tzinfo=None)
     query = select(Mark).where(
         Mark.assessment_id == assessment.id,
         Mark.username == payload.username,
@@ -80,7 +80,7 @@ def post_mark_for_section(
         mark.feedback = (
             payload.feedback if payload.feedback is not None else mark.feedback
         )
-        mark.timestamp = datetime.now(timezone.utc).replace(tzinfo=None)
+        mark.timestamp = timestamp
         mark.marker = marker
     else:
         mark = Mark(
@@ -92,6 +92,7 @@ def post_mark_for_section(
             feedback=payload.feedback,
             username=payload.username,
             marker=marker,
+            timestamp=timestamp,
         )
         session.add(mark)
     session.add(
@@ -100,7 +101,7 @@ def post_mark_for_section(
             mark=payload.mark,
             feedback=payload.feedback,
             marker=mark.marker,
-            timestamp=mark.timestamp,
+            timestamp=timestamp,
         )
     )
     session.commit()
