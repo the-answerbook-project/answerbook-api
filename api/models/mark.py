@@ -1,10 +1,13 @@
 from datetime import datetime
 
-from sqlalchemy import Column, DateTime, func
+from sqlalchemy import Column, DateTime, UniqueConstraint, func
 from sqlmodel import Field, Relationship, SQLModel
 
 
 class Mark(SQLModel, table=True):
+    __table_args__ = (
+        UniqueConstraint("assessment_id", "username", "question", "part", "section"),
+    )
     id: int = Field(primary_key=True)
     assessment_id: int = Field(foreign_key="assessment.id", index=True)
     username: str = Field(nullable=False, foreign_key="student.username")

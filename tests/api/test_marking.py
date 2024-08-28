@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 
 import pytest
 from freezegun import freeze_time
+from sqlalchemy.exc import IntegrityError
 
 from api.models.assessment import UserRole
 
@@ -32,6 +33,19 @@ def test_GET_requests_on_marking_endopints_return_403_if_user_not_a_marker(
     res = client_with_token().get(url)
     assert res.status_code == 403
     assert res.json()["detail"] == "You don't have permissions to access this resource."
+
+
+def test_no_two_marks_can_exist_for_same_section_and_username(assessment_factory):
+    with pytest.raises(IntegrityError):
+        assessment_factory(
+            code=assessment_code,
+            with_students=[
+                dict(
+                    username="hpotter",
+                    with_marks=[dict(**valid_section), dict(**valid_section)],
+                ),
+            ],
+        )
 
 
 def test_POST_requests_on_marking_endopints_return_403_if_user_not_a_marker(
