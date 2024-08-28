@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 import pytest
 from freezegun import freeze_time
 from sqlalchemy import func
+from sqlalchemy.exc import IntegrityError
 from sqlmodel import select
 
 from api.models.answer import AnswerHistory
@@ -205,3 +206,16 @@ def test_new_answer_adds_to_answer_history(
         AnswerHistory.answer_id == answer_id
     )
     assert session.exec(query).one() == 2
+
+
+def test_candidate_cannot_have_two_answers_for_same_question(assessment_factory):
+    with pytest.raises(IntegrityError):
+        assessment_factory(
+            code=assessment_code,
+            with_students=[
+                dict(
+                    username="hpotter",
+                    with_answers=[dict(**valid_answer), dict(**valid_answer)],
+                )
+            ],
+        )

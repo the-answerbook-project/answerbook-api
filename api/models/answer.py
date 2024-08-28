@@ -1,12 +1,17 @@
 from datetime import datetime
 from ipaddress import IPv4Address
 
-from sqlalchemy import Column, DateTime, func
+from sqlalchemy import Column, DateTime, UniqueConstraint, func
 from sqlalchemy.dialects.postgresql import INET
 from sqlmodel import Field, Relationship, SQLModel
 
 
 class Answer(SQLModel, table=True):
+    __table_args__ = (
+        UniqueConstraint(
+            "assessment_id", "username", "question", "part", "section", "task"
+        ),
+    )
     id: int | None = Field(primary_key=True, default=None)
     assessment_id: int = Field(foreign_key="assessment.id", index=True)
     username: str = Field(nullable=False, foreign_key="student.username")
