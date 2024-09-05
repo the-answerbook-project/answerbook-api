@@ -77,7 +77,7 @@ class Part(SQLModel):
 
 
 class Question(SQLModel):
-    title: str
+    title: str | None = None
     show_part_weights: bool = True
     instructions: str | None = None
     parts: dict[int, Part]
@@ -105,7 +105,7 @@ class AssessmentSpec(SQLModel):
     duration: int
     delayed_starts: dict[str, str] = {}
     extensions: dict[str, str] = {}
-    labelled_subparts: bool
+    labelled_subparts: bool = True
     rubric: Rubric
     questions: dict[int, Question]
 
