@@ -1,22 +1,22 @@
-from contextlib import contextmanager
+import json
 
 import typer
 from sqlalchemy import text
-from sqlmodel import SQLModel
-from typer import Argument
+from sqlmodel import Session, SQLModel
 
-from api.dependencies import get_session
-from api.factories import AnswerFactory, StudentFactory, all_factories
+from api.authentication.internal_authentication import pwd_context
+from api.database.connection import engine
+from api.factories import (
+    AssessmentFactory,
+    all_factories,
+)
 
 cli = typer.Typer()
 
-
-@contextmanager
-def dynamic_session():
-    session = next(get_session())
-    for f in all_factories:
-        f._meta.sqlalchemy_session = session
-    yield
+# Configure reference db session for all factories
+session = Session(engine)
+for f in all_factories:
+    f._meta.sqlalchemy_session = session
 
 
 @cli.command(name="erase_data")
@@ -28,8 +28,6 @@ def erase_data():
         "Are you sure you want to erase all data from the tables? This action cannot be undone."
     )
     if confirm:
-        session = next(get_session())
-
         # Iterate over all tables and delete data
         for table in reversed(SQLModel.metadata.sorted_tables):
             session.execute(text(f"DELETE FROM {table.name}"))  # nosec
@@ -40,113 +38,55 @@ def erase_data():
 
 
 @cli.command(name="populate_db")
-def populate_db(
-    year: str = Argument(help="Academic year in short form e.g. 2324 for 2023-2024"),
-):
+def populate_db():
     """
     Populates the database with dummy data.
     """
-    with dynamic_session():
-        StudentFactory(username="hgranger", exam_id="y2023_12345_exam")
-        StudentFactory(username="hpotter", exam_id="y2023_12345_exam")
-        AnswerFactory(
-            exam_id="y2023_12345_exam",
-            username="hpotter",
-            question=1,
-            part=1,
-            section=1,
-            task=1,
-        )
-        AnswerFactory(
-            exam_id="y2023_12345_exam",
-            username="hpotter",
-            question=1,
-            part=1,
-            section=1,
-            task=2,
-        )
-        AnswerFactory(
-            exam_id="y2023_12345_exam",
-            username="hpotter",
-            question=1,
-            part=1,
-            section=1,
-            task=3,
-        )
-        AnswerFactory(
-            exam_id="y2023_12345_exam",
-            username="hpotter",
-            question=2,
-            part=1,
-            section=1,
-            task=1,
-        )
-        AnswerFactory(
-            exam_id="y2023_12345_exam",
-            username="hpotter",
-            question=2,
-            part=1,
-            section=1,
-            task=1,
-        )
-        AnswerFactory(
-            exam_id="y2023_12345_exam",
-            username="hpotter",
-            question=3,
-            part=1,
-            section=1,
-            task=1,
-        )
-
-        StudentFactory(username="hgranger", exam_id="y2023_12345_exam")
-        AnswerFactory(
-            exam_id="y2023_12345_exam",
-            username="hgranger",
-            question=1,
-            part=1,
-            section=1,
-            task=1,
-        )
-        AnswerFactory(
-            exam_id="y2023_12345_exam",
-            username="hgranger",
-            question=1,
-            part=1,
-            section=1,
-            task=2,
-        )
-        AnswerFactory(
-            exam_id="y2023_12345_exam",
-            username="hgranger",
-            question=1,
-            part=1,
-            section=1,
-            task=3,
-        )
-        AnswerFactory(
-            exam_id="y2023_12345_exam",
-            username="hgranger",
-            question=2,
-            part=1,
-            section=1,
-            task=1,
-        )
-        AnswerFactory(
-            exam_id="y2023_12345_exam",
-            username="hgranger",
-            question=2,
-            part=1,
-            section=1,
-            task=1,
-        )
-        AnswerFactory(
-            exam_id="y2023_12345_exam",
-            username="hgranger",
-            question=3,
-            part=1,
-            section=1,
-            task=1,
-        )
+    AssessmentFactory(
+        code="y2023_12345_exam",
+        with_credentials=[
+            dict(username="hpotter", hashed_password=pwd_context.hash("pass")),
+            dict(username="hgranger", hashed_password=pwd_context.hash("pass")),
+            dict(username="adumble", hashed_password=pwd_context.hash("pass")),
+        ],
+        with_markers=[dict(username="adumble")],
+        with_students=[
+            dict(
+                username="hpotter",
+                with_answers=[
+                    dict(question=1, part=1, section=1, task=1, answer="a,d,e"),
+                    dict(question=1, part=1, section=1, task=2, answer="d"),
+                    dict(question=1, part=1, section=1, task=3),
+                    dict(question=1, part=1, section=2, task=1, answer="43"),
+                    dict(
+                        question=1,
+                        part=2,
+                        section=1,
+                        task=1,
+                        answer=json.dumps({"latex": r"\frac{1}{3}x^{3}+C"}),
+                    ),
+                    dict(question=2, part=1, section=1, task=2),
+                ],
+            ),
+            dict(
+                username="hgranger",
+                with_answers=[
+                    dict(question=1, part=1, section=1, task=1, answer="b,c"),
+                    dict(question=1, part=1, section=1, task=2, answer="d"),
+                    dict(question=1, part=1, section=1, task=3),
+                    dict(question=1, part=1, section=2, task=1, answer="42"),
+                    dict(
+                        question=1,
+                        part=2,
+                        section=1,
+                        task=1,
+                        answer=json.dumps({"latex": r"\int x^2"}),
+                    ),
+                    dict(question=2, part=1, section=1, task=2),
+                ],
+            ),
+        ],
+    )
     print("Database populated successfully.")
 
 
@@ -156,17 +96,14 @@ def populate_demo_data():
     Populates the database with demo data.
     """
 
-    with dynamic_session():
-        StudentFactory(username="hgranger", exam_id="y2023_12345_exam")
-        StudentFactory(username="hpotter", exam_id="y2023_12345_exam")
-        StudentFactory(username="rweasley", exam_id="y2023_12345_exam")
-        StudentFactory(username="kss22", exam_id="y2023_12345_exam")
-        StudentFactory(username="bn322", exam_id="y2023_12345_exam")
-        StudentFactory(username="ma4723", exam_id="y2023_12345_exam")
-        StudentFactory(username="jsbailey", exam_id="y2023_12345_exam")
-        StudentFactory(username="rbc", exam_id="y2023_12345_exam")
-        StudentFactory(username="ip914", exam_id="y2023_12345_exam")
-
+    AssessmentFactory(
+        code="y2023_12345_exam",
+        with_students=[
+            dict(username="hgranger"),
+            dict(username="hpotter"),
+            dict(username="rweasley"),
+        ],
+    )
     print("Demo data populated Database populated successfully.")
 
 

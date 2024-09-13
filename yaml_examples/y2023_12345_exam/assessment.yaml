@@ -1,0 +1,95 @@
+course code: 11111
+course name: The course name
+alternative codes:
+  - 22222
+  - 33333
+begins: "2024-09-05T10:00:00+00:00"
+duration: 120
+extensions:
+    hpotter: 10 minutes
+rubric:
+  instructions: |
+    * Refer to the pdf question paper for instructions and full questions.
+    * For each question, either type your answers in the relevant text boxes, or upload them here using the dropzone at the end of the question.
+    * You can make changes to your answers as many times as you like before the deadline; only your final submission will be marked.
+  questions to answer: 2
+
+1:
+  title: Comprehensive showcase
+  instructions: |
+    The following exemplifies all the question types currently supported by Answerbook.
+
+    This question's instructions: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+    Aenean id justo id sem venenatis hendrerit sit amet vitae elit. Nulla vestibulum placerat nibh, id tincidunt libero varius a.
+  a:
+    instructions: |
+      This part's instructions: Phasellus eu sollicitudin sem, eu dictum nulla. Integer diam arcu, tempor vitae faucibus
+      vitae, ullamcorper in est. Nam vel cursus risus. Phasellus feugiat, nisi eget dapibus ultrices, enim arcu accumsan lacus,
+      quis euismod urna mauris sed neque. Maecenas gravida egestas nunc id ultrices.
+    i:
+      instructions: |
+        This section's instructions: Nullam nulla turpis, rhoncus ac eros non, tempor sodales augue.
+        Cras pretium lacus massa, a suscipit neque tempor eget. Duis ex sapien, fermentum lobortis accumsan vel,
+        auctor semper leo. Quisque porta rhoncus elit, in interdum tellus fringilla in.
+      maximum mark: 12
+      tasks:
+      - instructions: Which of these are books by Asimov?
+        type: multiple choice select several
+        choices:
+          - a: "Foundation"
+          - b: "Children of Time"
+          - c: "City"
+          - d: "The gods themselves"
+          - e: "Rendez-vous with Rama"
+      - instructions: |
+          Asimov postulated some laws as the theoretical basis for his magnum opus. Which laws were they, and how many?
+        type: multiple choice select one
+        choices:
+          - a: "Laws of Robotics, 5"
+          - b: "Laws of Time travelling, 3"
+          - c: "Laws of Time travelling, 5"
+          - d: "Laws of Robotics, 3"
+      - instructions: |
+          In a few sentences, describe what TDD is and how it fits in the agile development mindset.
+        type: essay
+        lines: 10
+    ii:
+      maximum mark: 15
+      tasks:
+      - instructions: What's the answer to life, the universe and everything?
+        type: integer
+      - instructions: Write a recursive memoized version of Fibonacci in Haskell
+        type: code
+        lines: 10
+      - instructions: Find the secret flag in this page (used by Networks and Web Sec)
+        type: flag
+  b:
+    i:
+      maximum mark: 14
+      tasks:
+      - instructions: |
+          Compute the integral of $x^2$
+        type: processed handwriting
+      - instructions: |
+          Draw the symbol of the Deathly Hallows
+        type: raw handwriting
+
+2:
+  a:
+    instructions: |
+      For the following, take the density to be 1024 kg/m3, the velocity to be 30 m/s, the diameter of the pipe to be 0.3m, and the viscosity to be 0.00149.
+    i:
+      instructions: Calculate the Reynolds Number and justify what type of flow it is.
+      maximum mark: 4
+      tasks:
+      - instructions: Enter the Re value.
+        type: integer
+      - instructions: Explain the type of flow.
+        type : essay
+        lines: 5
+    ii:
+      instructions: Write a Python script to calculate a Re value.
+      maximum mark: 5
+      tasks:
+      - type: code
+        lines: 10

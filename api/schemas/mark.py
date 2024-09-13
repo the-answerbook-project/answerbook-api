@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 
+from pydantic import field_serializer
 from sqlmodel import SQLModel
 
 from api.schemas import BaseSchema
@@ -12,9 +13,14 @@ class MarkHistoryRead(BaseSchema):
     marker: str
     timestamp: datetime
 
+    @field_serializer("timestamp")
+    def serialize_timestamp(self, timestamp: datetime, _info):
+        return timestamp.replace(tzinfo=timezone.utc).isoformat()
+
 
 class MarkRead(BaseSchema):
     id: int
+    username: str
     question: int
     part: int
     section: int
@@ -24,8 +30,13 @@ class MarkRead(BaseSchema):
     timestamp: datetime
     history: list[MarkHistoryRead]
 
+    @field_serializer("timestamp")
+    def serialize_timestamp(self, timestamp: datetime, _info):
+        return timestamp.replace(tzinfo=timezone.utc).isoformat()
+
 
 class MarkWrite(SQLModel):
+    username: str
     question: int
     part: int
     section: int

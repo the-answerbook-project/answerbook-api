@@ -5,6 +5,7 @@ from api.utils import (
     is_single_lowercase_alpha,
     lowercase_alpha_to_int,
     lowercase_roman_to_int,
+    parse_interval,
 )
 
 
@@ -83,3 +84,27 @@ def test_roman_to_int(input_str, expected):
 )
 def test_letter_to_int(input_letter, expected):
     assert lowercase_alpha_to_int(input_letter) == expected
+
+
+@pytest.mark.parametrize(
+    "invalid_extension",
+    ["", "     ", "4a1", "minutes"],
+)
+def test_parsing_invalid_extension_throws_value_error(invalid_extension):
+    with pytest.raises(ValueError):
+        parse_interval(invalid_extension)
+
+
+@pytest.mark.parametrize(
+    "extension_string, expected_int",
+    [
+        ("4", 4),
+        ("12", 12),
+        ("12 minutes", 12),
+        ("12      minutes", 12),
+    ],
+)
+def test_parsing_valid_extension_returns_expected_integer_value(
+    extension_string, expected_int
+):
+    assert parse_interval(extension_string) == expected_int
