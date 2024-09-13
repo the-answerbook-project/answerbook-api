@@ -4,7 +4,7 @@ import factory
 from factory import Faker
 from factory.alchemy import SQLAlchemyModelFactory
 
-from api.dependencies import get_session
+from api.factories.marker import MarkerFactory
 from api.factories.student import StudentFactory
 from api.models.assessment import Assessment, AuthenticationMode
 from api.models.internal_credentials import InternalCredentials
@@ -13,7 +13,6 @@ from api.models.internal_credentials import InternalCredentials
 class InternalCredentialsFactory(SQLAlchemyModelFactory):
     class Meta:
         model = InternalCredentials
-        sqlalchemy_session = get_session()
         sqlalchemy_session_persistence = "commit"
 
     username: str = Faker(
@@ -25,7 +24,6 @@ class InternalCredentialsFactory(SQLAlchemyModelFactory):
 class AssessmentFactory(SQLAlchemyModelFactory):
     class Meta:
         model = Assessment
-        sqlalchemy_session = get_session()
         sqlalchemy_session_persistence = "commit"
 
     code: str = Faker("pystr_format", string_format="y####_#####_exam")
@@ -38,13 +36,24 @@ class AssessmentFactory(SQLAlchemyModelFactory):
         if create and students:
             if isinstance(students, int):
                 for _ in range(students):
-                    StudentFactory(
-                        assessment_id=self.id,
-                        exam_id=self.code,
-                    )
+                    StudentFactory(assessment_id=self.id)
             if isinstance(students, list):
                 for s in students:
-                    StudentFactory(assessment_id=self.id, exam_id=self.code, **s)
+                    StudentFactory(assessment_id=self.id, **s)
+
+    @factory.post_generation
+    def with_markers(
+        self: Assessment, create: bool, markers: int | list[dict], **kwargs
+    ) -> None:
+        if create and markers:
+            if isinstance(markers, int):
+                for _ in range(markers):
+                    MarkerFactory(
+                        assessment_id=self.id,
+                    )
+            if isinstance(markers, list):
+                for m in markers:
+                    MarkerFactory(assessment_id=self.id, **m)
 
     @factory.post_generation
     def with_credentials(

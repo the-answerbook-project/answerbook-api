@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from enum import StrEnum, auto
 
 from pydantic import field_validator, model_validator
@@ -10,6 +10,7 @@ from api.utils import (
     is_single_lowercase_alpha,
     lowercase_alpha_to_int,
     lowercase_roman_to_int,
+    parse_interval,
 )
 
 
@@ -76,7 +77,7 @@ class Part(SQLModel):
 
 
 class Question(SQLModel):
-    title: str
+    title: str | None = None
     show_part_weights: bool = True
     instructions: str | None = None
     parts: dict[int, Part]
@@ -102,8 +103,9 @@ class AssessmentSpec(SQLModel):
     alternative_codes: list[str]
     begins: datetime
     duration: int
-    extensions: dict[str, str]
-    labelled_subparts: bool
+    delayed_starts: dict[str, str] = {}
+    extensions: dict[str, str] = {}
+    labelled_subparts: bool = True
     rubric: Rubric
     questions: dict[int, Question]
 
@@ -122,8 +124,21 @@ class AssessmentSpec(SQLModel):
         }
         return values
 
+    def computed_beginning_for_candidate(self, username):
+        delay = parse_interval(self.delayed_starts.get(username, "0"))
+        return self.begins + timedelta(minutes=delay)
 
-class AssessmentSummary(BaseSchema):
+    def computed_duration_for_candidate(self, username):
+        ext = parse_interval(self.extensions.get(username, "0"))
+        return self.duration + ext
+
+    def computed_end_time_for_candidate(self, username):
+        duration = self.computed_duration_for_candidate(username)
+        duration_td = timedelta(minutes=duration)
+        return self.computed_beginning_for_candidate(username) + duration_td
+
+
+class AssessmentHeading(BaseSchema):
     course_code: str
     course_name: str
     begins: datetime

@@ -4,7 +4,7 @@ from operator import attrgetter
 from sqlalchemy import Column
 from sqlmodel import Enum, Field, Relationship, SQLModel
 
-from api.models.student import Student
+from api.models.student import Marker, Student
 
 
 class AuthenticationMode(StrEnum):
@@ -38,8 +38,13 @@ class Assessment(SQLModel, table=True):
     candidates: list[Student] = Relationship(
         sa_relationship_kwargs={"cascade": "all,delete,delete-orphan"},
     )
+    markers: list[Marker] = Relationship(
+        sa_relationship_kwargs={"cascade": "all,delete,delete-orphan"},
+    )
 
     def get_role(self, username: str) -> UserRole | None:
         if username in set(map(attrgetter("username"), self.candidates)):
             return UserRole.CANDIDATE
+        if username in set(map(attrgetter("username"), self.markers)):
+            return UserRole.MARKER
         return None

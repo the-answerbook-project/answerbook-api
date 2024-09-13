@@ -1,12 +1,15 @@
 import re
 
+LOWER_ROMAN_NUMERAL = r"^[ivxlcdm]+$"
+INTERVAL = r"^(\d+)\s*(minutes)?$"
+
 
 def is_single_lowercase_alpha(s: str) -> bool:
     return len(s) == 1 and s.islower()
 
 
 def is_lowercase_roman_numeral(s: str) -> bool:
-    roman_numeral_pattern = re.compile(r"^[ivxlcdm]+$")
+    roman_numeral_pattern = re.compile(LOWER_ROMAN_NUMERAL)
     return bool(roman_numeral_pattern.match(s))
 
 
@@ -24,3 +27,13 @@ def lowercase_roman_to_int(s: str) -> int:
 
 def lowercase_alpha_to_int(letter):
     return ord(letter.lower()) - ord("a") + 1
+
+
+def parse_interval(interval: str) -> int:
+    """
+    Parse a string of the form 'n' or 'n minutes' into the corresponding integer for 'n'
+    to be interpreted as a duration in minutes.
+    """
+    if match := re.compile(INTERVAL).match(interval):
+        return int(match.group(1))
+    raise ValueError(f"Invalid interval: '{interval}'")

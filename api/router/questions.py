@@ -1,10 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException
+from starlette import status
 from starlette.status import HTTP_404_NOT_FOUND
 
-from api.dependencies import get_assessment
+from api.dependencies import get_assessment_spec, validate_token
 from api.schemas.exam import AssessmentSpec, Question
 
-questions_router = APIRouter(prefix="/questions/{question_number}", tags=["exam"])
+questions_router = APIRouter(
+    prefix="/{assessment_code}/questions/{question_number}", tags=["exam"]
+)
 
 
 @questions_router.get(
@@ -19,7 +22,8 @@ The response include exam metadata, such as start time and end time for the curr
 )
 def get_question(
     question_number: int,
-    assessment: AssessmentSpec = Depends(get_assessment),
+    assessment: AssessmentSpec = Depends(get_assessment_spec),
+    _=Depends(validate_token),
 ):
     if question_number not in assessment.questions:
         raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="Question not found")

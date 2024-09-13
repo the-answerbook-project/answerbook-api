@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-from unittest.mock import Mock
 
 import pytest
 from fastapi import FastAPI
@@ -10,13 +9,14 @@ from sqlalchemy_utils import create_database, database_exists, drop_database
 from sqlmodel import Session, SQLModel, create_engine
 
 from api import create_application, factories
-from api.authentication.ldap_authentication import LdapAuthenticator
+from api.authentication.jwt_utils import JwtSubject
 from api.dependencies import (
     get_assessment_id,
-    get_ldap_authenticator,
     get_session,
     get_settings,
+    validate_token,
 )
+from api.models.assessment import UserRole
 from api.settings import Settings
 
 ASSESSMENTS_DIR = Path(__file__).parent / "test_assessments"
@@ -61,6 +61,9 @@ def session_fixture(db_engine):
 def app_fixture(session: Session):
     app: FastAPI = create_application()
 
+    def validate_token_override():
+        pass
+
     def get_session_override():
         return session
 
@@ -69,6 +72,7 @@ def app_fixture(session: Session):
 
     app.dependency_overrides[get_session] = get_session_override
     app.dependency_overrides[get_settings] = get_settings_override
+    app.dependency_overrides[validate_token] = validate_token_override
     yield app
     app.dependency_overrides.clear()
 
@@ -85,3 +89,20 @@ def client_fixture(app):
 @pytest.fixture(name="client_")
 def client_fixture_(app):
     return TestClient(app)
+
+
+@pytest.fixture(name="client_with_token")
+def client_with_token_fixture(app):
+    def _client_with_token(**kwargs):
+        sub = dict(
+            username="hpotter", role="CANDIDATE", assessment_code="y2023_12345_exam"
+        )
+
+        def validate_token_override():
+            sub.update(**kwargs)
+            return JwtSubject(**sub)
+
+        app.dependency_overrides[validate_token] = validate_token_override
+        return TestClient(app)
+
+    return _client_with_token

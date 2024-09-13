@@ -2,14 +2,19 @@ from datetime import datetime, timedelta, timezone
 
 import jwt
 from fastapi import APIRouter, Depends, HTTPException, Response
-from fastapi.security import OAuth2PasswordBearer
-from pydantic import BaseModel
-from sqlmodel import Session, select
+from fastapi.security import OAuth2PasswordRequestForm
+from sqlmodel import Session
 from starlette import status
 
 from api.authentication.internal_authentication import (
     get_user_credentials,
     verify_password,
+)
+from api.authentication.jwt_utils import (
+    JWT_ALGO,
+    TWO_HOURS_IN_MINUTES,
+    Token,
+    oauth2_scheme,
 )
 from api.authentication.ldap_authentication import LdapAuthenticator
 from api.dependencies import (
@@ -22,31 +27,11 @@ from api.dependencies import (
 from api.models.assessment import Assessment, AuthenticationMode
 from api.models.revoked_token import RevokedToken
 from api.schemas.exam import AssessmentSpec
+from api.utils import parse_interval
 
 authentication_router = APIRouter(
     prefix="/{assessment_code}/auth", tags=["authentication"]
 )
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
-JWT_ALGO = "HS256"
-TWO_HOURS_IN_MINUTES = 120
-
-
-class Credentials(BaseModel):
-    username: str
-    password: str
-
-
-class JwtSubject(BaseModel):
-    username: str
-    role: str
-    assessment_code: str
-
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str
 
 
 def create_access_token(subject: dict, expires_delta: timedelta):
@@ -85,8 +70,7 @@ def authenticate_via_ldap(
 def calculate_token_expiration(
     assessment_duration: int, extensions: dict[str, str]
 ) -> timedelta:
-    max_extension = max(*extensions.values(), "0")
-    max_extension = max_extension.split(" ")[0].replace("minutes", "")
+    max_extension = parse_interval(max(*extensions.values(), "0"))
     minutes = assessment_duration
     minutes += int(max_extension)
     minutes += TWO_HOURS_IN_MINUTES
@@ -104,19 +88,13 @@ Possible authentication methods are
 """,
 )
 def login(
-    credentials: Credentials,
     assessment_code: str,
+    credentials: OAuth2PasswordRequestForm = Depends(),
     ldap_authenticator: LdapAuthenticator = Depends(get_ldap_authenticator),
-    config: Assessment | None = Depends(get_assessment_config),
-    spec: AssessmentSpec | None = Depends(get_assessment_spec),
+    spec: AssessmentSpec = Depends(get_assessment_spec),
+    config: Assessment = Depends(get_assessment_config),
     session: Session = Depends(get_session),
 ) -> Token:
-    if config is None or spec is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Assessment not found.",
-        )
-
     role = config.get_role(credentials.username)
     if role is None:
         raise HTTPException(

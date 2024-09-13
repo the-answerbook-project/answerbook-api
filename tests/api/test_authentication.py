@@ -1,21 +1,28 @@
 from datetime import timedelta
 from unittest.mock import Mock
 
+import jwt
 import pytest
+from fastapi import HTTPException
 from fastapi.testclient import TestClient
 from sqlmodel import select
 
+from api import Settings
 from api.authentication.internal_authentication import pwd_context
+from api.authentication.jwt_utils import JwtSubject
 from api.authentication.ldap_authentication import LdapAuthenticator
-from api.dependencies import get_ldap_authenticator
-from api.models.assessment import AuthenticationMode
+from api.dependencies import (
+    get_ldap_authenticator,
+    validate_token,
+)
+from api.models.assessment import AuthenticationMode, UserRole
 from api.models.revoked_token import RevokedToken
 from api.router.authentication import calculate_token_expiration, create_access_token
 
 
 def test_logging_in_to_assessment_with_no_configuration_gives_404(client_):
     res = client_.post(
-        "/not_exists/auth/login", json=dict(username="hpotter", password="password")
+        "/not_exists/auth/login", data=dict(username="hpotter", password="password")
     )
     assert res.status_code == 404
     assert res.json()["detail"] == "Assessment not found."
@@ -27,7 +34,7 @@ def test_logging_in_to_assessment_with_no_specification_gives_404(
     assessment_factory(code="y1234_4321_exam")
     res = client_.post(
         "/y1234_4321_exam/auth/login",
-        json=dict(username="hpotter", password="password"),
+        data=dict(username="hpotter", password="password"),
     )
     assert res.status_code == 404
     assert res.json()["detail"] == "Assessment not found."
@@ -36,10 +43,10 @@ def test_logging_in_to_assessment_with_no_specification_gives_404(
 def test_cannot_login_to_assessment_if_not_candidate_or_marker(
     client_, assessment_factory
 ):
-    assessment_factory(code="y2023_12345_exam")
+    assessment_factory(code="simple")
     res = client_.post(
-        "/y2023_12345_exam/auth/login",
-        json=dict(username="hpotter", password="password"),
+        "/simple/auth/login",
+        data=dict(username="hpotter", password="password"),
     )
     assert res.status_code == 401
     assert res.json()["detail"] == "Username not registered for assessment."
@@ -49,13 +56,13 @@ def test_internal_authentication_login_fails_for_missing_credentials(
     client_, assessment_factory
 ):
     assessment_factory(
-        code="y2023_12345_exam",
+        code="simple",
         authentication_mode=AuthenticationMode.INTERNAL,
         with_students=[dict(username="hpotter")],
     )
     res = client_.post(
-        "/y2023_12345_exam/auth/login",
-        json=dict(username="hpotter", password="password"),
+        "/simple/auth/login",
+        data=dict(username="hpotter", password="password"),
     )
 
     assert res.status_code == 401
@@ -66,7 +73,7 @@ def test_internal_authentication_login_fails_for_invalid_credentials(
     client_, assessment_factory
 ):
     assessment_factory(
-        code="y2023_12345_exam",
+        code="simple",
         authentication_mode=AuthenticationMode.INTERNAL,
         with_students=[dict(username="hpotter")],
         with_credentials=[
@@ -76,8 +83,8 @@ def test_internal_authentication_login_fails_for_invalid_credentials(
         ],
     )
     res = client_.post(
-        "/y2023_12345_exam/auth/login",
-        json=dict(username="hpotter", password="password"),
+        "/simple/auth/login",
+        data=dict(username="hpotter", password="password"),
     )
 
     assert res.status_code == 401
@@ -89,7 +96,7 @@ def test_internal_authentication_login_with_valid_credentials_returns_token(
 ):
     pwd = "password"
     assessment_factory(
-        code="y2023_12345_exam",
+        code="simple",
         authentication_mode=AuthenticationMode.INTERNAL,
         with_students=[dict(username="hpotter")],
         with_credentials=[
@@ -97,8 +104,8 @@ def test_internal_authentication_login_with_valid_credentials_returns_token(
         ],
     )
     res = client_.post(
-        "/y2023_12345_exam/auth/login",
-        json=dict(username="hpotter", password=pwd),
+        "/simple/auth/login",
+        data=dict(username="hpotter", password=pwd),
     )
 
     assert res.status_code == 200
@@ -111,7 +118,7 @@ def test_ldap_authentication_login_with_valid_credentials_returns_token(
     app, assessment_factory
 ):
     assessment_factory(
-        code="y2023_12345_exam",
+        code="simple",
         authentication_mode=AuthenticationMode.LDAP,
         with_students=[dict(username="hpotter")],
     )
@@ -122,8 +129,8 @@ def test_ldap_authentication_login_with_valid_credentials_returns_token(
     app.dependency_overrides[get_ldap_authenticator] = lambda: authenticator
 
     res = TestClient(app).post(
-        "/y2023_12345_exam/auth/login",
-        json=dict(username="hpotter", password="password"),
+        "/simple/auth/login",
+        data=dict(username="hpotter", password="password"),
     )
     assert res.status_code == 200
     mock_ldap_authentication.assert_called_once_with("hpotter", "password")
@@ -157,3 +164,59 @@ def test_calculation_of_token_expiration(duration, extensions, expected_minutes)
     assert calculate_token_expiration(duration, extensions) == timedelta(
         minutes=expected_minutes
     )
+
+
+def test_token_validation_fails_with_401_if_token_is_invalid():
+    with pytest.raises(HTTPException) as http_exception:
+        validate_token(settings=Settings())
+    assert http_exception.value.status_code == 401
+
+
+def test_token_validation_fails_with_401_if_token_subject_is_none(monkeypatch):
+    monkeypatch.setattr(jwt, "decode", lambda *args, **kwargs: {"sub": None})
+    with pytest.raises(HTTPException) as http_exception:
+        validate_token(settings=Settings())
+    assert http_exception.value.status_code == 401
+
+
+def test_token_validation_fails_with_401_if_assessment_code_mismatches(monkeypatch):
+    subject = {
+        "assessment_code": "123",
+        "username": "hpotter",
+        "role": UserRole.CANDIDATE,
+    }
+    monkeypatch.setattr(jwt, "decode", lambda *args, **kwargs: {"sub": subject})
+    with pytest.raises(HTTPException) as http_exception:
+        validate_token(settings=Settings(), assessment=Mock(code="456"))
+    assert http_exception.value.status_code == 401
+
+
+def test_token_validation_fails_with_401_if_candidate_not_enrolled_to_assessment(
+    monkeypatch, assessment_factory, session
+):
+    assessment = assessment_factory()
+    subject = {
+        "assessment_code": assessment.code,
+        "username": "hpotter",
+        "role": UserRole.CANDIDATE,
+    }
+    monkeypatch.setattr(jwt, "decode", lambda *args, **kwargs: {"sub": subject})
+    with pytest.raises(HTTPException) as http_exception:
+        validate_token(settings=Settings(), session=session, assessment=assessment)
+    assert http_exception.value.status_code == 401
+
+
+def test_successful_token_validation_returns_token_payload(
+    monkeypatch, assessment_factory, session
+):
+    assessment = assessment_factory(with_students=[dict(username="hpotter")])
+    subject = {
+        "assessment_code": assessment.code,
+        "username": "hpotter",
+        "role": UserRole.CANDIDATE,
+    }
+    monkeypatch.setattr(jwt, "decode", lambda *args, **kwargs: {"sub": subject})
+    payload = validate_token(
+        settings=Settings(), session=session, assessment=assessment
+    )
+    assert payload == JwtSubject(**subject)
