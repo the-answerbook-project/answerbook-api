@@ -51,7 +51,7 @@ jobs:
           python-version-file: 'pyproject.toml'
           cache: 'poetry'
       - name: Check style
-        run: poetry run ruff --select I
+        run: poetry run ruff check --select I
 
 
   test:
